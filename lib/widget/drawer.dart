@@ -1,0 +1,109 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sqlcheatcode/notifier/theme_notifier.dart';
+import 'package:sqlcheatcode/pages/pdfViewer/pdfGridPage.dart';
+import 'package:sqlcheatcode/pages/quizApp/record.dart';
+
+class NavDrawer extends ConsumerWidget {
+  const NavDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(themeChangerNotifierProvider);
+    bool isDark = ref.watch(themeChangerNotifierProvider.notifier).getValue();
+
+    return Drawer(
+      child: Column(
+        // padding: EdgeInsets.zero,
+        children: <Widget>[
+          // const DrawerHeader(
+          //   decoration: BoxDecoration(
+          //     // color: Colors.green,
+          //     image: DecorationImage(
+          //       fit: BoxFit.fill,
+          //       image: AssetImage('assets/images/cover.png'),
+          //     ),
+          //   ),
+          //   child: Text(
+          //     'Side menu',
+          //     style: TextStyle(color: Colors.white, fontSize: 25),
+          //   ),
+          // ),
+
+          Container(
+            width: double.infinity,
+            height: 200,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                colorFilter: ColorFilter.mode(
+                  isDark
+                      ? Color.fromARGB(255, 75, 135, 77)
+                      : Colors.transparent,
+                  isDark ? BlendMode.color : BlendMode.color,
+                ),
+                fit: BoxFit.cover,
+                image: AssetImage('assets/images/cover2.png'),
+              ),
+            ),
+            child: const Text(
+              '',
+              style: TextStyle(color: Colors.white, fontSize: 25),
+            ),
+          ),
+          const SizedBox(height: 10),
+          ListTile(
+            leading: const Icon(Icons.picture_as_pdf_rounded),
+            title: const Text('Course Book'),
+            onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PdfGridCard(),
+                ),
+              )
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.history_outlined),
+            title: const Text(
+              'Recodes',
+            ),
+            onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const RecordScreen(),
+                ),
+              )
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text('Settings'),
+            onTap: () => {Navigator.of(context).pop()},
+          ),
+
+          ListTile(
+            leading: const Icon(Icons.exit_to_app),
+            title: const Text('Exit'),
+            onTap: () => {Navigator.of(context).pop()},
+          ),
+          Switch(
+            activeColor: Colors.green,
+            value: ref.read(themeChangerNotifierProvider.notifier).getValue(),
+            onChanged: (value) {
+              ref.read(themeChangerNotifierProvider.notifier).toggleTheme();
+            },
+          ),
+          const Spacer(),
+          const ListTile(
+            title: Text(
+              "Verstion demo",
+              textAlign: TextAlign.center,
+            ),
+          )
+        ],
+      ),
+    );
+  }
+}
