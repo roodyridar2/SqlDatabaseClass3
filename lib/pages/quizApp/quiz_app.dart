@@ -86,10 +86,10 @@ class _QuizAppState extends ConsumerState<QuizApp> {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController _textController = TextEditingController();
-
+    ref.watch(themeChangerNotifierProvider);
     bool isDarkMode =
         ref.watch(themeChangerNotifierProvider.notifier).getValue();
+    TextEditingController _textController = TextEditingController();
     return Scaffold(
       body: Column(
         children: [
@@ -199,13 +199,21 @@ class _QuizAppState extends ConsumerState<QuizApp> {
                       borderRadius: BorderRadius.circular(29.0),
                     ),
                     clipBehavior: Clip.antiAlias,
-                    color: isTappedList[index]
-                        ? isDarkMode
+                    color: isDarkMode
+                        ? isTappedList[index]
                             ? Colors.green
-                            : Colors.blue
-                        : isDarkMode
-                            ? const CardTheme().color
+                            : CardTheme().color
+                        : isTappedList[index]
+                            ? Colors.blue
                             : Colors.white70,
+                    // isTappedList[index]
+                    //     ? isDarkMode
+                    //         ? Colors.green
+                    //         : Colors.blue
+                    //     : isDarkMode
+                    //         ? const CardTheme().color
+                    //         : Colors.white70,
+
                     child: Center(
                       child: Text(
                         "Lecture ${index + 1}",

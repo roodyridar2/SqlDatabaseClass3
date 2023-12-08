@@ -15,14 +15,14 @@ final navigatorKey = GlobalKey<NavigatorState>();
 
 final List<Widget> _tableList = [
   const Scaffold(body: Center(child: Text("Chat"))),
-  QuizApp(),
-  Home(),
+  const Home(),
+  const QuizApp(),
 ];
 void main() async {
   await Hive.initFlutter();
   await Hive.openBox("myTimer");
   await Hive.openBox("myRecord");
-  await Hive.openBox("userQuestion");
+  // await Hive.openBox("userQuestion");
 
   runApp(const ProviderScope(child: MyApp()));
 }
