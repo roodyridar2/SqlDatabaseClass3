@@ -182,8 +182,10 @@ class _QuizAppState extends ConsumerState<QuizApp> {
                           selectedNumberOfQuestion -=
                               allQuestionsData[index].length;
                           sliderValue -= allQuestionsData[index].length;
-                          if (selectedNumberOfQuestion < 0) {
-                            selectedNumberOfQuestion = 0;
+                          if (sliderValue < 0) {
+                            // selectedNumberOfQuestion = 0;
+                            sliderValue = 0;
+                            // sliderValue = selectedNumberOfQuestion.toDouble();
                           }
                         }
                       } catch (e) {
@@ -191,7 +193,6 @@ class _QuizAppState extends ConsumerState<QuizApp> {
                           print(e);
                         }
                       }
-                      print(selectedNumberOfQuestion);
                     });
                   },
                   child: Card(
@@ -202,18 +203,10 @@ class _QuizAppState extends ConsumerState<QuizApp> {
                     color: isDarkMode
                         ? isTappedList[index]
                             ? Colors.green
-                            : CardTheme().color
+                            : const CardTheme().color
                         : isTappedList[index]
                             ? Colors.blue
                             : Colors.white70,
-                    // isTappedList[index]
-                    //     ? isDarkMode
-                    //         ? Colors.green
-                    //         : Colors.blue
-                    //     : isDarkMode
-                    //         ? const CardTheme().color
-                    //         : Colors.white70,
-
                     child: Center(
                       child: Text(
                         "Lecture ${index + 1}",
@@ -247,16 +240,16 @@ class _QuizAppState extends ConsumerState<QuizApp> {
                 textAlign: TextAlign.center,
               ),
               SizedBox(
-                width: 30,
+                width: 100,
                 child: Text(
-                  "${sliderValue.toInt()}",
+                  "${sliderValue.toInt()}/$selectedNumberOfQuestion",
                   style: TextStyle(
                     color: isDarkMode
-                        ? Color.fromARGB(255, 70, 238, 75)
+                        ? const Color.fromARGB(255, 70, 238, 75)
                         : Colors.blue,
                     fontSize: 25,
                   ),
-                  textAlign: TextAlign.center,
+                  textAlign: TextAlign.left,
                 ),
               ),
             ],
@@ -274,8 +267,14 @@ class _QuizAppState extends ConsumerState<QuizApp> {
 
             onChanged: selectedNumberOfQuestion > 0
                 ? (value) {
+                    print(value);
+                    print(selectedNumberOfQuestion);
                     setState(() {
-                      sliderValue = value;
+                      if (value < 0) {
+                        sliderValue = 0;
+                      } else {
+                        sliderValue = value;
+                      }
                     });
                   }
                 : null,
@@ -312,7 +311,7 @@ class _QuizAppState extends ConsumerState<QuizApp> {
                   }
                   // return;
                 }
-                if (allQuestion.isEmpty) {
+                if (allQuestion.isEmpty || sliderValue == 0) {
                   return;
                 }
                 // shuffle question and cut them to slider value
