@@ -53,7 +53,7 @@ class _PdfGridCardState extends ConsumerState<PdfGridCard> {
                   child: Column(
                     children: [
                       Text(
-                        "Zhenar shaho",
+                        "Dr.Zhenar shaho",
                         style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,

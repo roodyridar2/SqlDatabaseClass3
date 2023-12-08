@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:date_format/date_format.dart';
+import 'package:sqlcheatcode/notifier/theme_notifier.dart';
 
-class RecordScreen extends StatefulWidget {
+class RecordScreen extends ConsumerStatefulWidget {
   const RecordScreen({super.key});
 
   @override
-  State<RecordScreen> createState() => _RecordScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _RecordScreenState();
 }
 
-class _RecordScreenState extends State<RecordScreen> {
+class _RecordScreenState extends ConsumerState<RecordScreen> {
   @override
   Widget build(BuildContext context) {
     final myRecordBox = Hive.box('myRecord');
     List listRecord = myRecordBox.get("listRecord") ?? [];
+    bool isDarkMode =
+        ref.watch(themeChangerNotifierProvider.notifier).getValue();
 
     return Scaffold(
       appBar: AppBar(
@@ -83,7 +87,7 @@ class _RecordScreenState extends State<RecordScreen> {
                             ),
                             leading: const Icon(Icons.history_outlined),
                             dense: true,
-                            iconColor: Colors.green,
+                            iconColor: isDarkMode ? Colors.green : Colors.blue,
                           ),
                         ),
                         IconButton(

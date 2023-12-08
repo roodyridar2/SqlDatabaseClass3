@@ -15,8 +15,8 @@ final navigatorKey = GlobalKey<NavigatorState>();
 
 final List<Widget> _tableList = [
   const Scaffold(body: Center(child: Text("Chat"))),
-  Home(),
   QuizApp(),
+  Home(),
 ];
 void main() async {
   await Hive.initFlutter();
@@ -116,11 +116,11 @@ class _MyApp2State extends ConsumerState<MyApp>
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(50),
             child: CustomAppBarMain(
-                controller: _controller,
-                myTimerBox: _myTimerBox,
-                onTimeSave: saveTime,
-                getTime: getTime,
-                ),
+              controller: _controller,
+              myTimerBox: _myTimerBox,
+              onTimeSave: saveTime,
+              getTime: getTime,
+            ),
           ),
 
           //  CustomAppBarMain(

@@ -8,7 +8,7 @@ import 'package:sqlcheatcode/notifier/theme_notifier.dart';
 import 'package:sqlcheatcode/pages/quizApp/add_quiz_screen.dart';
 import 'package:sqlcheatcode/pages/quizApp/question_screen.dart';
 import 'package:sqlcheatcode/pages/quizApp/result.dart';
-import 'package:sqlcheatcode/pages/templateQuries/template.dart';
+import 'package:sqlcheatcode/pages/quizApp/widget/show_nodata_dialog.dart';
 
 class QuizApp extends ConsumerStatefulWidget {
   const QuizApp({super.key});
@@ -81,15 +81,25 @@ class _QuizAppState extends ConsumerState<QuizApp> {
     }
   }
 
+  int selectedNumberOfQuestion = 0;
+  double sliderValue = 0.0;
+
   @override
   Widget build(BuildContext context) {
+    TextEditingController _textController = TextEditingController();
+
     bool isDarkMode =
         ref.watch(themeChangerNotifierProvider.notifier).getValue();
     return Scaffold(
       body: Column(
         children: [
-          Text("Selected Lectured to start Quiz",
-              style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            "Selected Lectured to start Quiz",
+            style: TextStyle(
+              color: isDarkMode ? Colors.white : Colors.blue,
+              fontSize: 24,
+            ),
+          ),
           const SizedBox(
             height: 20,
           ),
@@ -111,11 +121,25 @@ class _QuizAppState extends ConsumerState<QuizApp> {
               setState(() {
                 _selectAll = value!;
                 isTappedList = List.generate(itemCount, (index) => value);
+                // slider
+                if (value) {
+                  int questionCount = 0;
+
+                  for (int i = 0; i < allQuestionsData.length; i++) {
+                    questionCount += allQuestionsData[i].length;
+                  }
+                  // print(questionCount);
+                  selectedNumberOfQuestion = questionCount;
+                  sliderValue = selectedNumberOfQuestion.toDouble();
+                } else {
+                  selectedNumberOfQuestion = 0;
+                  sliderValue = selectedNumberOfQuestion.toDouble();
+                }
               });
             },
           ),
           SizedBox(
-            height: 430,
+            height: 370,
             child: GridView.builder(
               itemCount: itemCount,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -128,7 +152,7 @@ class _QuizAppState extends ConsumerState<QuizApp> {
                   borderRadius: BorderRadius.circular(29),
                   onLongPress: () {
                     if (index > allQuestionsData.length - 1) {
-                      _showNoDataDialog(context);
+                      showNoDataDialog(context);
                       return;
                     }
                     setState(() {
@@ -148,6 +172,26 @@ class _QuizAppState extends ConsumerState<QuizApp> {
                       isTappedList[index] = !isTappedList[index];
 
                       isTapped = !isTapped;
+
+                      try {
+                        if (isTappedList[index]) {
+                          selectedNumberOfQuestion +=
+                              allQuestionsData[index].length;
+                          sliderValue += allQuestionsData[index].length;
+                        } else {
+                          selectedNumberOfQuestion -=
+                              allQuestionsData[index].length;
+                          sliderValue -= allQuestionsData[index].length;
+                          if (selectedNumberOfQuestion < 0) {
+                            selectedNumberOfQuestion = 0;
+                          }
+                        }
+                      } catch (e) {
+                        if (kDebugMode) {
+                          print(e);
+                        }
+                      }
+                      print(selectedNumberOfQuestion);
                     });
                   },
                   child: Card(
@@ -161,12 +205,18 @@ class _QuizAppState extends ConsumerState<QuizApp> {
                             : Colors.blue
                         : isDarkMode
                             ? const CardTheme().color
-                            : Colors.black12,
+                            : Colors.white70,
                     child: Center(
                       child: Text(
                         "Lecture ${index + 1}",
-                        style:
-                            const TextStyle(color: Colors.white, fontSize: 20),
+                        style: TextStyle(
+                          color: isDarkMode
+                              ? Colors.white
+                              : isTappedList[index]
+                                  ? Colors.white
+                                  : Colors.blue,
+                          fontSize: 20,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -175,6 +225,54 @@ class _QuizAppState extends ConsumerState<QuizApp> {
               },
             ),
           ),
+          // Number of Selected Question
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Selected Question: ",
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.blue,
+                  fontSize: 25,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(
+                width: 30,
+                child: Text(
+                  "${sliderValue.toInt()}",
+                  style: TextStyle(
+                    color: isDarkMode
+                        ? Color.fromARGB(255, 70, 238, 75)
+                        : Colors.blue,
+                    fontSize: 25,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+
+          Slider(
+            // thumbColor: Colors.white
+            min: 0.0,
+            max: selectedNumberOfQuestion.toDouble(),
+            value: sliderValue,
+            activeColor: isDarkMode ? Colors.green : Colors.blue,
+            divisions:
+                selectedNumberOfQuestion == 0 ? 1 : selectedNumberOfQuestion,
+            // inactiveColor: Colors.white,
+
+            onChanged: selectedNumberOfQuestion > 0
+                ? (value) {
+                    setState(() {
+                      sliderValue = value;
+                    });
+                  }
+                : null,
+          ),
+          // Start Quiz Button
           SizedBox(
             width: 200,
             child: OutlinedButton(
@@ -201,16 +299,17 @@ class _QuizAppState extends ConsumerState<QuizApp> {
                     }
                   }
                 } catch (e) {
-                  print(e);
+                  if (kDebugMode) {
+                    print(e);
+                  }
                   // return;
                 }
-                allQuestion.shuffle();
-
                 if (allQuestion.isEmpty) {
                   return;
                 }
-                // print(allQuestion.length);
-                // print(selectedAnswer.length);
+                // shuffle question and cut them to slider value
+                allQuestion.shuffle();
+                allQuestion = allQuestion.sublist(0, sliderValue.toInt());
 
                 Navigator.push(
                   context,
@@ -243,30 +342,4 @@ class _QuizAppState extends ConsumerState<QuizApp> {
       ),
     );
   }
-}
-
-void _showNoDataDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        alignment: Alignment.center,
-        title: const Text('No Data Available'),
-        content: const Text('Coming soon.'),
-        actions: <Widget>[
-          Center(
-            child: TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-              child: const Text(
-                'OK',
-                style: TextStyle(fontSize: 20),
-              ),
-            ),
-          ),
-        ],
-      );
-    },
-  );
 }
