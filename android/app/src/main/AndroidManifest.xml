@@ -1,9 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+ <!-- this line to play music -->
     <application
         android:label="sqlcheatcode"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher" android:enableOnBackInvokedCallback="true">
-
+        android:icon="@mipmap/ic_launcher"
+         android:enableOnBackInvokedCallback="true"
+         >
+       
         <!-- Add the following line to enable OnBackInvokedCallback -->
         <meta-data
             android:name="android:enableOnBackInvokedCallback"

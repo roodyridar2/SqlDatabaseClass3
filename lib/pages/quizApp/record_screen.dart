@@ -16,6 +16,8 @@ class _RecordScreenState extends ConsumerState<RecordScreen> {
   Widget build(BuildContext context) {
     final myRecordBox = Hive.box('myRecord');
     List listRecord = myRecordBox.get("listRecord") ?? [];
+    listRecord = listRecord.reversed.toList();
+    
     bool isDarkMode =
         ref.watch(themeChangerNotifierProvider.notifier).getValue();
 

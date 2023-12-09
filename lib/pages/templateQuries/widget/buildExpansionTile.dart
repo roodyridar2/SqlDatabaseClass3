@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sqlcheatcode/main.dart';
+import 'package:sqlcheatcode/notifier/theme_notifier.dart';
 import 'package:sqlcheatcode/pages/templateQuries/widget/sqlFormattedText.dart';
+import 'package:sqlcheatcode/util/constText.dart';
 
 Widget buildExpansionTile({
   required String title,
-  required List<String> keywords,
+  // required List<String> keywords,
   required List<String> texts,
-  required List<String> keywords2,
+  // required List<String> keywords2,
   required List<String> texts2,
   required String description,
   required String imagePath,
@@ -27,7 +30,8 @@ Widget buildExpansionTile({
       elevation: 4,
       child: ExpansionTile(
         shape: Border.all(color: Colors.transparent),
-        title: SqlFormattedText(keywords: keywords, texts: texts),
+        // title: SqlFormattedText(keywords: keywords, texts: texts),
+        title: SqlFormatterText(texts),
         children: [
           Container(
             width: double.infinity,
@@ -39,7 +43,8 @@ Widget buildExpansionTile({
                 children: [
                   Text(description),
                   const SizedBox(height: 10),
-                  SqlFormattedText(keywords: keywords2, texts: texts2),
+                  // SqlFormattedText(keywords: keywords2, texts: texts2),
+                  SqlFormatterText(texts2)
                 ],
               ),
             ),
@@ -49,7 +54,6 @@ Widget buildExpansionTile({
     ),
   );
 }
-
 
 class ShowDialogImage extends StatefulWidget {
   const ShowDialogImage({super.key, required this.imagePath});
@@ -150,6 +154,33 @@ class _ShowDialogImageState extends State<ShowDialogImage> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class SqlFormatterText extends ConsumerWidget {
+  const SqlFormatterText(this.listTexts, {super.key});
+  final List<String> listTexts;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(themeChangerNotifierProvider);
+    bool isDarkMode =
+        ref.watch(themeChangerNotifierProvider.notifier).getValue();
+    return Row(
+      children: [
+        for (int i = 0; i < listTexts.length; i++)
+          if (listKeywordsSql.contains(listTexts[i].toUpperCase()))
+            Text(
+              listTexts[i].toUpperCase(),
+              style: TextStyle(
+                color: isDarkMode ? Colors.green : Colors.blue,
+                fontWeight: FontWeight.bold,
+              ),
+            )
+          else
+            Text(" ${listTexts[i]} ")
+      ],
     );
   }
 }

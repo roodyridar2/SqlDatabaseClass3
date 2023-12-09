@@ -1,8 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqlcheatcode/notifier/theme_notifier.dart';
 import 'package:sqlcheatcode/pages/pdfViewer/pdfGridPage.dart';
-import 'package:sqlcheatcode/pages/quizApp/record.dart';
+import 'package:sqlcheatcode/pages/quizApp/record_screen.dart';
 
 class NavDrawer extends ConsumerWidget {
   const NavDrawer({super.key});
@@ -88,6 +89,18 @@ class NavDrawer extends ConsumerWidget {
             title: const Text('Exit'),
             onTap: () => {Navigator.of(context).pop()},
           ),
+          ListTile(
+            leading:  const Icon(
+              Icons.logout,
+              color: Colors.red
+            ),
+            title: const Text('Logout'),
+            onTap: ()  async{
+              await FirebaseAuth.instance.signOut();
+            },
+          ),
+          
+          
           Switch(
             activeColor: Colors.green,
             value: ref.read(themeChangerNotifierProvider.notifier).getValue(),

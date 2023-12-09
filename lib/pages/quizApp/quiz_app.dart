@@ -7,7 +7,7 @@ import 'package:sqlcheatcode/model/quiz_model.dart';
 import 'package:sqlcheatcode/notifier/theme_notifier.dart';
 import 'package:sqlcheatcode/pages/quizApp/add_quiz_screen.dart';
 import 'package:sqlcheatcode/pages/quizApp/question_screen.dart';
-import 'package:sqlcheatcode/pages/quizApp/result.dart';
+import 'package:sqlcheatcode/pages/quizApp/result_screen.dart';
 import 'package:sqlcheatcode/pages/quizApp/widget/show_nodata_dialog.dart';
 
 class QuizApp extends ConsumerStatefulWidget {
