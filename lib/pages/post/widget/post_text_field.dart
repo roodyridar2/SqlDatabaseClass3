@@ -24,20 +24,23 @@ class PostTextField extends ConsumerWidget {
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.1),
+            // color: Colors.red,
             border: Border(
               top: BorderSide(
-                  color: isDarkMode ? Colors.white : Colors.blue, width: 1),
+                color: isDarkMode ? Colors.white : Colors.blue,
+                width: 1,
+              ),
             ),
           ),
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
           child: Row(
             children: [
               Expanded(
                 child: SizedBox(
-                  height: 80,
-                  width: double.infinity,
+                  height: 100,
+                  // width: double.infinity,
                   child: TextField(
-                    maxLength: 400,
+                    maxLength: 500,
                     cursorColor: isDarkMode ? Colors.white : Colors.black87,
                     style: TextStyle(
                       color: isDarkMode ? Colors.white : Colors.black,
@@ -45,6 +48,9 @@ class PostTextField extends ConsumerWidget {
                     maxLines: null,
                     controller: textEditingController,
                     decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 0, vertical: 0),
+                      // isDense: true,
                       hintText: 'What\'s on your mind?',
                       border: InputBorder.none,
                       hintStyle: TextStyle(
@@ -54,7 +60,7 @@ class PostTextField extends ConsumerWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(elevation: 10),
                 onPressed: () {

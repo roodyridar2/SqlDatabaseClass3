@@ -33,8 +33,6 @@ class _HomeState extends ConsumerState<Home> {
     bool isDarkMode =
         ref.watch(themeChangerNotifierProvider.notifier).getValue();
     return Scaffold(
-      // backgroundColor: Colors.grey[100],
-      // isDarkMode ? Colors.black : const Color.fromARGB(53, 255, 255, 255),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Column(

@@ -13,7 +13,7 @@ class MyButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onTaped,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color.fromARGB(255, 74, 163, 236),
+          backgroundColor: Colors.greenAccent,
           padding: const EdgeInsets.symmetric(
             horizontal: 30,
             vertical: 15,

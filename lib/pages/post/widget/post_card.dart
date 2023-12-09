@@ -30,35 +30,119 @@ class MyCard extends ConsumerWidget {
     TextEditingController textEditingController = TextEditingController();
 
     return Card(
-      elevation: 5, // Set margin around the card
+      // elevation: 5, // Set margin around the card
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              content,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            Row(
+              children: [
+                Text(
+                  email,
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: isDarkMode ? Colors.green : Colors.blue,
+                  ),
+                ),
+                const Spacer(),
+                Visibility(
+                  visible: FirebaseAuth.instance.currentUser!.email == email,
+                  child: PopupMenuButton(itemBuilder: (context) {
+                    return [
+                      PopupMenuItem(
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            textEditingController.text = content;
+
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return SizedBox(
+                                    child: AlertDialog(
+                                      title: const Text('Edit Post'),
+                                      content: SizedBox(
+                                        width: 500,
+                                        height: 100,
+                                        child: TextField(
+                                          maxLength: 400,
+                                          maxLines: null,
+                                          controller: textEditingController,
+                                        ),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text(
+                                            'Cancel',
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            onUpdated(
+                                                textEditingController.text);
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text(
+                                            'Save',
+                                            style: TextStyle(
+                                              color: isDarkMode
+                                                  ? Colors.green
+                                                  : Colors.blue,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                });
+                          },
+                          child: const Text('Edit'),
+                        ),
+                      ),
+                      PopupMenuItem(
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            onDelete();
+                          },
+                          child: const Text(
+                            'Delete',
+                            style: TextStyle(
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ];
+                  }),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            SingleChildScrollView(
+              child: Text(
+                content,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             const SizedBox(height: 8),
-            Text(
-              email,
-              style: TextStyle(
-                fontSize: 15,
-                color: isDarkMode ? Colors.green : Colors.blue,
-              ),
-            ),
-            const SizedBox(height: 8),
+            const Spacer(),
             Row(
               children: [
                 const Icon(
                   Icons.access_time,
                   color: Colors.grey,
                 ),
-                const SizedBox(width: 4),
                 Text(
                   // '12:34 PM - 9 Dec 2023',
                   formatTimestamp(timeStamp).toString(),
@@ -68,71 +152,71 @@ class MyCard extends ConsumerWidget {
                   ),
                 ),
                 const Spacer(),
-                Visibility(
-                  visible: FirebaseAuth.instance.currentUser!.email == email,
-                  child: IconButton(
-                    onPressed: onDelete,
-                    icon: const Icon(
-                      Icons.delete,
-                      color: Color.fromARGB(255, 239, 77, 65),
-                    ),
-                  ),
-                ),
-                Visibility(
-                  visible: email == FirebaseAuth.instance.currentUser!.email,
-                  child: IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      textEditingController.text = content;
+                // Visibility(
+                //   visible: FirebaseAuth.instance.currentUser!.email == email,
+                //   child: IconButton(
+                //     onPressed: onDelete,
+                //     icon: const Icon(
+                //       Icons.delete,
+                //       color: Color.fromARGB(255, 239, 77, 65),
+                //     ),
+                //   ),
+                // ),
+                // Visibility(
+                //   visible: email == FirebaseAuth.instance.currentUser!.email,
+                //   child: IconButton(
+                //     icon: const Icon(Icons.edit),
+                //     onPressed: () {
+                //       textEditingController.text = content;
 
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return SizedBox(
-                              child: AlertDialog(
-                                title: const Text('Edit Post'),
-                                content: SizedBox(
-                                  width: 500,
-                                  height: 100,
-                                  child: TextField(
-                                    maxLength: 400,
-                                    maxLines: null,
-                                    controller: textEditingController,
-                                  ),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: const Text(
-                                      'Cancel',
-                                      style: TextStyle(
-                                        color: Colors.red,
-                                      ),
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      onUpdated(textEditingController.text);
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text(
-                                      'Save',
-                                      style: TextStyle(
-                                        color: isDarkMode
-                                            ? Colors.green
-                                            : Colors.blue,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          });
-                    },
-                  ),
-                ),
+                //       showDialog(
+                //           context: context,
+                //           builder: (context) {
+                //             return SizedBox(
+                //               child: AlertDialog(
+                //                 title: const Text('Edit Post'),
+                //                 content: SizedBox(
+                //                   width: 500,
+                //                   height: 100,
+                //                   child: TextField(
+                //                     maxLength: 400,
+                //                     maxLines: null,
+                //                     controller: textEditingController,
+                //                   ),
+                //                 ),
+                //                 actions: [
+                //                   TextButton(
+                //                     onPressed: () {
+                //                       Navigator.pop(context);
+                //                     },
+                //                     child: const Text(
+                //                       'Cancel',
+                //                       style: TextStyle(
+                //                         color: Colors.red,
+                //                       ),
+                //                     ),
+                //                   ),
+                //                   TextButton(
+                //                     onPressed: () {
+                //                       onUpdated(textEditingController.text);
+                //                       Navigator.pop(context);
+                //                     },
+                //                     child: Text(
+                //                       'Save',
+                //                       style: TextStyle(
+                //                         color: isDarkMode
+                //                             ? Colors.green
+                //                             : Colors.blue,
+                //                       ),
+                //                     ),
+                //                   ),
+                //                 ],
+                //               ),
+                //             );
+                //           });
+                //     },
+                //   ),
+                // ),
               ],
             ),
           ],
