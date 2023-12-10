@@ -52,14 +52,29 @@ class _PdfGridCardState extends ConsumerState<PdfGridCard> {
                   onLongPress: _launchInBrowserView,
                   child: Column(
                     children: [
-                      Text(
-                        "Dr.Zhenar shaho",
-                        style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: isDarkMode
-                                ? Colors.white
-                                : const Color.fromARGB(255, 66, 164, 245)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Dr.",
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: isDarkMode
+                                  ? Colors.green
+                                  : const Color.fromARGB(255, 66, 164, 245),
+                            ),
+                          ),
+                          Text(
+                            "Zhenar shaho",
+                            style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                                color: isDarkMode
+                                    ? Colors.white
+                                    : const Color.fromARGB(255, 66, 164, 245)),
+                          ),
+                        ],
                       ),
                       Container(
                         width: 170,

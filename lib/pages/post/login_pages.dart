@@ -20,6 +20,13 @@ class _LoginPageState extends State<LoginPage> {
       builder: (context) => const Center(child: CircularProgressIndicator()),
     );
     try {
+      if (passwordTextEditingController.text.length < 8) {
+        if (context.mounted) {
+          Navigator.pop(context);
+        }
+
+        return;
+      }
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailTextEditingController.text,
         password: passwordTextEditingController.text,
@@ -39,7 +46,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(37, 31, 51, 0),
+      backgroundColor: const Color.fromARGB(255, 18, 24, 25),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -75,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             const SizedBox(height: 16),
-      
+
             const SizedBox(
               width: double.infinity,
               child: Text(
@@ -95,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
               obscureText: false,
             ),
             const SizedBox(height: 10),
-      
+
             const SizedBox(
               width: double.infinity,
               child: Text(
@@ -115,20 +122,31 @@ class _LoginPageState extends State<LoginPage> {
               obscureText: true,
             ),
             const SizedBox(height: 20),
-      
+
             // sign in button
             MyButton(text: "Sign in", onTaped: signIn),
             const SizedBox(height: 10),
-      
+
             // go to register page
-      
+
             TextButton(
               onPressed: widget.onTaped,
-              child: const Text(
-                "Not registered yet? Sign up",
-                style: TextStyle(
-                  color: Colors.white,
-                ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Not registered yet? ",
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    "Sign up",
+                    style: TextStyle(
+                      color: Colors.greenAccent,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

@@ -67,7 +67,7 @@ class _PostScreenState extends ConsumerState<PostScreen> {
         'id': FirebaseFirestore.instance.collection('User Posts').doc().id,
       });
     } catch (e) {
-      print('Error: $e');
+      // print('Error: $e');
     }
     // _scrollController.animateTo(
     //   _scrollController.position.maxScrollExtent,

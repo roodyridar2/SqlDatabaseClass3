@@ -32,6 +32,7 @@ Widget buildExpansionTile({
         shape: Border.all(color: Colors.transparent),
         // title: SqlFormattedText(keywords: keywords, texts: texts),
         title: SqlFormatterText(texts),
+        // subtitle: Text(description),
         children: [
           Container(
             width: double.infinity,
@@ -167,7 +168,9 @@ class SqlFormatterText extends ConsumerWidget {
     ref.watch(themeChangerNotifierProvider);
     bool isDarkMode =
         ref.watch(themeChangerNotifierProvider.notifier).getValue();
-    return Row(
+    return Wrap(
+      spacing: 8,
+      crossAxisAlignment: WrapCrossAlignment.start,
       children: [
         for (int i = 0; i < listTexts.length; i++)
           if (listKeywordsSql.contains(listTexts[i].toUpperCase()))
@@ -179,7 +182,7 @@ class SqlFormatterText extends ConsumerWidget {
               ),
             )
           else
-            Text(" ${listTexts[i]} ")
+            Text(listTexts[i])
       ],
     );
   }

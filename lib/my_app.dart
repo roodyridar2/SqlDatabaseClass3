@@ -94,17 +94,7 @@ class _MyApp2State extends ConsumerState<MyApp>
     bool isDarkMode =
         ref.watch(themeChangerNotifierProvider.notifier).getValue();
 
-    return
-        //  MaterialApp
-        //  (
-        // navigatorKey: navigatorKey,
-        // debugShowCheckedModeBanner: false,
-        // title: 'Flutter Demo',
-        // theme: ThemeData.light(),
-        // darkTheme: ThemeData.dark(),
-        // themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
-        // home:
-        SafeArea(
+    return SafeArea(
       child: Scaffold(
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(50),

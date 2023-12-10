@@ -64,6 +64,7 @@ class PostTextField extends ConsumerWidget {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(elevation: 10),
                 onPressed: () {
+                  FocusScope.of(context).unfocus();
                   postMessage();
                 },
                 child: Text(
@@ -71,7 +72,7 @@ class PostTextField extends ConsumerWidget {
                   style: TextStyle(
                     fontSize: 16,
                     color: isDarkMode
-                        ? Color.fromARGB(255, 83, 195, 87)
+                        ? const Color.fromARGB(255, 83, 195, 87)
                         : Colors.blue,
                   ),
                 ),

@@ -32,6 +32,13 @@ class _RegisterPageState extends State<RegisterPage> {
 
           return;
         }
+        if (passwordTextEditingController.text.length < 8) {
+          if (context.mounted) {
+            Navigator.pop(context);
+          }
+
+          return;
+        }
 
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: emailTextEditingController.text,
@@ -50,7 +57,7 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(37, 31, 51, 0),
+      backgroundColor: const Color.fromARGB(255, 18, 24, 25),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(20.0),
@@ -144,11 +151,22 @@ class _RegisterPageState extends State<RegisterPage> {
 
               TextButton(
                 onPressed: widget.onTaped,
-                child: const Text(
-                  "Already have account login in",
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Already have account! ",
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      "login in",
+                      style: TextStyle(
+                          color: Colors.greenAccent,
+                          fontWeight: FontWeight.bold,),
+                    ),
+                  ],
                 ),
               ),
             ],

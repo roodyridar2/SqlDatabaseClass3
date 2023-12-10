@@ -12,6 +12,8 @@ class NavDrawer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(themeChangerNotifierProvider);
     bool isDark = ref.watch(themeChangerNotifierProvider.notifier).getValue();
+    final currentUser = FirebaseAuth.instance.currentUser;
+    FocusScope.of(context).unfocus();
 
     return Drawer(
       child: Column(
@@ -30,7 +32,7 @@ class NavDrawer extends ConsumerWidget {
           //     style: TextStyle(color: Colors.white, fontSize: 25),
           //   ),
           // ),
-
+            
           Container(
             width: double.infinity,
             height: 200,
@@ -38,12 +40,12 @@ class NavDrawer extends ConsumerWidget {
               image: DecorationImage(
                 colorFilter: ColorFilter.mode(
                   isDark
-                      ? Color.fromARGB(255, 75, 135, 77)
+                      ? const Color.fromARGB(255, 75, 135, 77)
                       : Colors.transparent,
                   isDark ? BlendMode.color : BlendMode.color,
                 ),
                 fit: BoxFit.cover,
-                image: AssetImage('assets/images/cover2.png'),
+                image: const AssetImage('assets/images/cover2.png'),
               ),
             ),
             child: const Text(
@@ -52,6 +54,19 @@ class NavDrawer extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 10),
+          Text(
+            currentUser!.email!,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 10),
+          const Divider(
+            height: 1,
+            thickness: 1,
+          ),
+            
           ListTile(
             leading: const Icon(Icons.picture_as_pdf_rounded),
             title: const Text('Course Book'),
@@ -83,27 +98,19 @@ class NavDrawer extends ConsumerWidget {
             title: const Text('Settings'),
             onTap: () => {Navigator.of(context).pop()},
           ),
-
+            
           ListTile(
-            leading: const Icon(Icons.exit_to_app),
-            title: const Text('Exit'),
-            onTap: () => {Navigator.of(context).pop()},
-          ),
-          ListTile(
-            leading:  const Icon(
-              Icons.logout,
-              color: Colors.red
-            ),
+            leading: const Icon(Icons.logout, color: Colors.red),
             title: const Text('Logout'),
-            onTap: ()  async{
+            onTap: () async {
               await FirebaseAuth.instance.signOut();
             },
           ),
-          
-          
+            
           Switch(
             activeColor: Colors.green,
-            value: ref.read(themeChangerNotifierProvider.notifier).getValue(),
+            value:
+                ref.read(themeChangerNotifierProvider.notifier).getValue(),
             onChanged: (value) {
               ref.read(themeChangerNotifierProvider.notifier).toggleTheme();
             },
