@@ -1,10 +1,9 @@
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sqlcheatcode/notifier/theme_notifier.dart';
+// import 'package:sqlcheatcode/notifier/theme_notifier.dart';
 import 'package:sqlcheatcode/pages/post/widget/post_card.dart';
 import 'package:sqlcheatcode/pages/post/widget/post_text_field.dart';
 
@@ -64,7 +63,8 @@ class _PostScreenState extends ConsumerState<PostScreen> {
         'UserEmail': currentUser!.email,
         'Message': postMessage,
         'TimeStamp': Timestamp.now(),
-        'id': FirebaseFirestore.instance.collection('User Posts').doc().id,
+        // 'id': FirebaseFirestore.instance.collection('User Posts').doc().id,
+        'Likes': []
       });
     } catch (e) {
       // print('Error: $e');
@@ -81,12 +81,22 @@ class _PostScreenState extends ConsumerState<PostScreen> {
     // );
   }
 
-  PageController _scrollController = PageController();
+  void onDelete(QueryDocumentSnapshot<Object?> post) {
+    FirebaseFirestore.instance.collection('User Posts').doc(post.id).delete();
+  }
+
+  void onUpdated(String value, QueryDocumentSnapshot<Object?> post) {
+    FirebaseFirestore.instance.collection('User Posts').doc(post.id).update({
+      'Message': value,
+    });
+  }
+
+  final PageController _scrollController = PageController();
   @override
   Widget build(BuildContext context) {
-    ref.watch(themeChangerNotifierProvider);
-    bool isDarkMode =
-        ref.watch(themeChangerNotifierProvider.notifier).getValue();
+    // ref.watch(themeChangerNotifierProvider);
+    // bool isDarkMode =
+    //     ref.watch(themeChangerNotifierProvider.notifier).getValue();
     return Scaffold(
       // backgroundColor: isDarkMode ? Colors.black12 : Colors.grey[300],
       // resizeToAvoidBottomInset: false,
@@ -126,22 +136,13 @@ class _PostScreenState extends ConsumerState<PostScreen> {
                               child: MyCard(
                                 content: post['Message'],
                                 email: post['UserEmail'],
-                                onDelete: () {
-                                  FirebaseFirestore.instance
-                                      .collection('User Posts')
-                                      .doc(post.id)
-                                      .delete();
-                                },
+                                onDelete: () => onDelete(post),
                                 timeStamp: post['TimeStamp'],
                                 textContentController: textEditingController,
-                                onUpdated: (String value) {
-                                  FirebaseFirestore.instance
-                                      .collection('User Posts')
-                                      .doc(post.id)
-                                      .update({
-                                    'Message': value,
-                                  });
-                                },
+                                onUpdated: (String value) =>
+                                    onUpdated(value, post),
+                                likes: List<String>.from(post['Likes']?? []),
+                                postId: post.id,
                               ),
                             ),
                           ),

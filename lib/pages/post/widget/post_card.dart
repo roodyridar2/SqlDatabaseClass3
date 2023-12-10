@@ -3,9 +3,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqlcheatcode/notifier/theme_notifier.dart';
+import 'package:sqlcheatcode/pages/post/widget/like_button.dart';
 import 'package:sqlcheatcode/util/time_stamp_formatter.dart';
 
-class MyCard extends ConsumerWidget {
+class MyCard extends ConsumerStatefulWidget {
   const MyCard({
     super.key,
     required this.content,
@@ -14,212 +15,204 @@ class MyCard extends ConsumerWidget {
     required this.timeStamp,
     required this.textContentController,
     required this.onUpdated,
+    required this.likes,
+    required this.postId,
   });
+
   final String content;
   final String email;
   final Function() onDelete;
   final Timestamp timeStamp;
   final TextEditingController textContentController;
   final Function(String value) onUpdated;
+  final List<String> likes;
+  final String postId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() => _MyCardState();
+}
+
+class _MyCardState extends ConsumerState<MyCard> {
+  final currentUser = FirebaseAuth.instance.currentUser!;
+  bool isLiked = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    isLiked = widget.likes.contains(currentUser.email);
+  }
+
+  void toggleLike() {
+    setState(() {
+      isLiked = !isLiked;
+    });
+
+    // access the document in  firebase
+    DocumentReference documentReference =
+        FirebaseFirestore.instance.collection('User Posts').doc(widget.postId);
+    if (isLiked) {
+      documentReference.update({
+        'Likes': FieldValue.arrayUnion([currentUser.email])
+      });
+    } else {
+      documentReference.update({
+        'Likes': FieldValue.arrayRemove([currentUser.email])
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     ref.watch(themeChangerNotifierProvider);
     bool isDarkMode =
         ref.watch(themeChangerNotifierProvider.notifier).getValue();
     TextEditingController textEditingController = TextEditingController();
 
-    return Card(
-      // elevation: 5, // Set margin around the card
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text(
-                  email,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: isDarkMode ? Colors.green : Colors.blue,
+    return GestureDetector(
+      onDoubleTap: toggleLike,
+      child: Card(
+        // elevation: 5, // Set margin around the card
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    widget.email,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: isDarkMode ? Colors.green : Colors.blue,
+                    ),
                   ),
-                ),
-                const Spacer(),
-                Visibility(
-                  visible: FirebaseAuth.instance.currentUser!.email == email,
-                  child: PopupMenuButton(itemBuilder: (context) {
-                    return [
-                      PopupMenuItem(
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            textEditingController.text = content;
-
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return SizedBox(
-                                    child: AlertDialog(
-                                      title: const Text('Edit Post'),
-                                      content: SizedBox(
-                                        width: 500,
-                                        height: 100,
-                                        child: TextField(
-                                          maxLength: 400,
-                                          maxLines: null,
-                                          controller: textEditingController,
+                  const Spacer(),
+                  Visibility(
+                    visible:
+                        FirebaseAuth.instance.currentUser!.email == widget.email,
+                    child: PopupMenuButton(itemBuilder: (context) {
+                      return [
+                        PopupMenuItem(
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              textEditingController.text = widget.content;
+      
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return SizedBox(
+                                      child: AlertDialog(
+                                        title: const Text('Edit Post'),
+                                        content: SizedBox(
+                                          width: 500,
+                                          height: 100,
+                                          child: TextField(
+                                            maxLength: 400,
+                                            maxLines: null,
+                                            controller: textEditingController,
+                                          ),
                                         ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text(
+                                              'Cancel',
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              widget.onUpdated(
+                                                  textEditingController.text);
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text(
+                                              'Save',
+                                              style: TextStyle(
+                                                color: isDarkMode
+                                                    ? Colors.green
+                                                    : Colors.blue,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          child: const Text(
-                                            'Cancel',
-                                            style: TextStyle(
-                                              color: Colors.red,
-                                            ),
-                                          ),
-                                        ),
-                                        TextButton(
-                                          onPressed: () {
-                                            onUpdated(
-                                                textEditingController.text);
-                                            Navigator.pop(context);
-                                          },
-                                          child: Text(
-                                            'Save',
-                                            style: TextStyle(
-                                              color: isDarkMode
-                                                  ? Colors.green
-                                                  : Colors.blue,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                });
-                          },
-                          child: const Text('Edit'),
+                                    );
+                                  });
+                            },
+                            child: const Text('Edit'),
+                          ),
                         ),
-                      ),
-                      PopupMenuItem(
-                        child: TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            onDelete();
-                          },
-                          child: const Text(
-                            'Delete',
-                            style: TextStyle(
-                              color: Colors.red,
+                        PopupMenuItem(
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              widget.onDelete();
+                            },
+                            child: const Text(
+                              'Delete',
+                              style: TextStyle(
+                                color: Colors.red,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ];
-                  }),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            SingleChildScrollView(
-              child: Text(
-                content,
-                style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                ),
+                      ];
+                    }),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 8),
-            const Spacer(),
-            Row(
-              children: [
-                const Icon(
-                  Icons.access_time,
-                  color: Colors.grey,
-                ),
-                Text(
-                  // '12:34 PM - 9 Dec 2023',
-                  formatTimestamp(timeStamp).toString(),
+              const SizedBox(height: 8),
+              SingleChildScrollView(
+                child: Text(
+                  widget.content,
                   style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
+                    fontSize: 17,
                   ),
                 ),
-                const Spacer(),
-                // Visibility(
-                //   visible: FirebaseAuth.instance.currentUser!.email == email,
-                //   child: IconButton(
-                //     onPressed: onDelete,
-                //     icon: const Icon(
-                //       Icons.delete,
-                //       color: Color.fromARGB(255, 239, 77, 65),
-                //     ),
-                //   ),
-                // ),
-                // Visibility(
-                //   visible: email == FirebaseAuth.instance.currentUser!.email,
-                //   child: IconButton(
-                //     icon: const Icon(Icons.edit),
-                //     onPressed: () {
-                //       textEditingController.text = content;
-
-                //       showDialog(
-                //           context: context,
-                //           builder: (context) {
-                //             return SizedBox(
-                //               child: AlertDialog(
-                //                 title: const Text('Edit Post'),
-                //                 content: SizedBox(
-                //                   width: 500,
-                //                   height: 100,
-                //                   child: TextField(
-                //                     maxLength: 400,
-                //                     maxLines: null,
-                //                     controller: textEditingController,
-                //                   ),
-                //                 ),
-                //                 actions: [
-                //                   TextButton(
-                //                     onPressed: () {
-                //                       Navigator.pop(context);
-                //                     },
-                //                     child: const Text(
-                //                       'Cancel',
-                //                       style: TextStyle(
-                //                         color: Colors.red,
-                //                       ),
-                //                     ),
-                //                   ),
-                //                   TextButton(
-                //                     onPressed: () {
-                //                       onUpdated(textEditingController.text);
-                //                       Navigator.pop(context);
-                //                     },
-                //                     child: Text(
-                //                       'Save',
-                //                       style: TextStyle(
-                //                         color: isDarkMode
-                //                             ? Colors.green
-                //                             : Colors.blue,
-                //                       ),
-                //                     ),
-                //                   ),
-                //                 ],
-                //               ),
-                //             );
-                //           });
-                //     },
-                //   ),
-                // ),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(height: 8),
+              const Spacer(),
+              Row(
+                children: [
+                  Column(
+                    children: [
+                      LikeButton(
+                        isLiked: isLiked,
+                        onTap: toggleLike,
+                      ),
+                      Text(
+                        widget.likes.length.toString(),
+                        style: TextStyle(
+                          color: isDarkMode ? Colors.grey : Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  const Icon(
+                    Icons.access_time,
+                    color: Colors.grey,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    // '12:34 PM - 9 Dec 2023',
+                    formatTimestamp(widget.timeStamp).toString(),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
