@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sqlcheatcode/notifier/theme_notifier.dart';
 // import 'package:sqlcheatcode/notifier/theme_notifier.dart';
 import 'package:sqlcheatcode/pages/post/widget/post_card.dart';
 import 'package:sqlcheatcode/pages/post/widget/post_text_field.dart';
@@ -17,35 +18,9 @@ class PostScreen extends ConsumerStatefulWidget {
 class _PostScreenState extends ConsumerState<PostScreen> {
   final currentUser = FirebaseAuth.instance.currentUser;
   final textEditingController = TextEditingController();
-
-  // final ScrollController _scrollController = ScrollController();
-
-  // @override
-  // void initState() {
-  //   super.initState();
-
-  //   _scrollController.addListener(() {
-  //     if (_scrollController.offset >= 100.0) {
-  //       // Show the button when the user scrolls down by 100 pixels
-  //       setState(() {
-  //         _showScrollToTopButton = true;
-  //       });
-
-  //       // After 3 seconds, set _showScrollToTopButton back to false
-  //       Future.delayed(const Duration(seconds: 2), () {
-  //         setState(() {
-  //           _showScrollToTopButton = false;
-  //         });
-  //       });
-  //     }
-  //     // else {
-  //     //   // Hide the button when the user scrolls up
-  //     //   setState(() {
-  //     //     _showScrollToTopButton = false;
-  //     //   });
-  //     // }
-  //   });
-  // }
+  final PageController _scrollController = PageController();
+  final searchEditingController = TextEditingController();
+  String searchQuery = '';
 
   void postMessage() async {
     if (textEditingController.text.isEmpty) {
@@ -69,16 +44,6 @@ class _PostScreenState extends ConsumerState<PostScreen> {
     } catch (e) {
       // print('Error: $e');
     }
-    // _scrollController.animateTo(
-    //   _scrollController.position.maxScrollExtent,
-    //   duration: const Duration(seconds: 1),
-    //   curve: Curves.easeInOut,
-    // );
-    // _scrollController.animateTo(
-    //   0.0,
-    //   duration: const Duration(seconds: 1),
-    //   curve: Curves.easeInOut,
-    // );
   }
 
   void onDelete(QueryDocumentSnapshot<Object?> post) {
@@ -91,15 +56,16 @@ class _PostScreenState extends ConsumerState<PostScreen> {
     });
   }
 
-  final PageController _scrollController = PageController();
+  bool isVisible = true;
+  bool showSearchButton = true;
+
   @override
   Widget build(BuildContext context) {
-    // ref.watch(themeChangerNotifierProvider);
-    // bool isDarkMode =
-    //     ref.watch(themeChangerNotifierProvider.notifier).getValue();
+    ref.watch(themeChangerNotifierProvider);
+    bool isDarkMode =
+        ref.watch(themeChangerNotifierProvider.notifier).getValue();
     return Scaffold(
       // backgroundColor: isDarkMode ? Colors.black12 : Colors.grey[300],
-      // resizeToAvoidBottomInset: false,
 
       body: Stack(
         children: [
@@ -110,7 +76,21 @@ class _PostScreenState extends ConsumerState<PostScreen> {
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                final posts = snapshot.data!.docs;
+                List posts = snapshot.data!.docs;
+                // ----------------- Filter By Email -----------------
+
+                if (searchEditingController.text.isNotEmpty) {
+                  searchQuery = searchEditingController.text;
+
+                  final filterPost = posts
+                      .where((post) =>
+                          post['UserEmail'].toLowerCase().trim() ==
+                          searchQuery.toLowerCase().trim())
+                      .toList();
+                  posts = filterPost;
+                }
+
+                // ------------------------------------------
                 return NotificationListener<ScrollNotification>(
                   onNotification: (scrollNotification) {
                     // Add any additional logic you need based on scroll events
@@ -121,28 +101,40 @@ class _PostScreenState extends ConsumerState<PostScreen> {
                       itemCount: posts.length,
                       scrollDirection: Axis.vertical,
                       itemBuilder: (context, index) {
-                        final post = snapshot.data!.docs[index];
+                        final post = posts[index];
+
                         return SingleChildScrollView(
                           physics: const NeverScrollableScrollPhysics(),
-                          child: SizedBox(
-                            height: 525,
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                left: 8.0,
-                                right: 8.0,
-                                bottom: 25.0,
-                                top: 50.0,
-                              ),
-                              child: MyCard(
-                                content: post['Message'],
-                                email: post['UserEmail'],
-                                onDelete: () => onDelete(post),
-                                timeStamp: post['TimeStamp'],
-                                textContentController: textEditingController,
-                                onUpdated: (String value) =>
-                                    onUpdated(value, post),
-                                likes: List<String>.from(post['Likes']?? []),
-                                postId: post.id,
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                FocusScope.of(context).unfocus();
+
+                                isVisible = true;
+                                showSearchButton = true;
+                              });
+                            },
+                            child: SizedBox(
+                              // color: Colors.amber,
+                              height: 535,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                  left: 8.0,
+                                  right: 8.0,
+                                  bottom: 25.0,
+                                  top: 60.0,
+                                ),
+                                child: MyCard(
+                                  content: post['Message'],
+                                  email: post['UserEmail'],
+                                  onDelete: () => onDelete(post),
+                                  timeStamp: post['TimeStamp'],
+                                  textContentController: textEditingController,
+                                  onUpdated: (String value) =>
+                                      onUpdated(value, post),
+                                  likes: List<String>.from(post['Likes'] ?? []),
+                                  postId: post.id,
+                                ),
                               ),
                             ),
                           ),
@@ -156,41 +148,44 @@ class _PostScreenState extends ConsumerState<PostScreen> {
               }
             },
           ),
-          Positioned(
-            bottom: 110.0,
-            // left: MediaQuery.of(context).size.width / 2 - 25,
-            right: 20,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(200),
-              child: Container(
-                decoration: const BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 10,
-                      spreadRadius: 10,
-                      offset: Offset(0, 0),
-                    ),
-                  ],
-                ),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(
-                    sigmaX: 5.0,
-                    sigmaY: 5.0,
+          Visibility(
+            visible: isVisible,
+            child: Positioned(
+              bottom: 110.0,
+              // left: MediaQuery.of(context).size.width / 2 - 25,
+              right: 20,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(200),
+                child: Container(
+                  decoration: const BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 10,
+                        spreadRadius: 10,
+                        offset: Offset(0, 0),
+                      ),
+                    ],
                   ),
-                  child: IconButton(
-                    onPressed: () {
-                      _scrollController.animateToPage(
-                        0,
-                        duration: const Duration(seconds: 1),
-                        curve: Curves.easeInOut,
-                      );
-                    },
-                    icon: const Center(
-                      child: Icon(
-                        Icons.arrow_upward,
-                        color: Colors.green,
-                        size: 25.0,
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: 5.0,
+                      sigmaY: 5.0,
+                    ),
+                    child: IconButton(
+                      onPressed: () {
+                        _scrollController.animateToPage(
+                          0,
+                          duration: const Duration(seconds: 1),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                      icon: const Center(
+                        child: Icon(
+                          Icons.arrow_upward,
+                          color: Colors.green,
+                          size: 25.0,
+                        ),
                       ),
                     ),
                   ),
@@ -198,37 +193,40 @@ class _PostScreenState extends ConsumerState<PostScreen> {
               ),
             ),
           ),
-          Positioned(
-            bottom: 110.0,
-            // left: MediaQuery.of(context).size.width / 2 - 25,
-            left: 20,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(200),
-              child: Container(
-                decoration: const BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 10,
-                      spreadRadius: 10,
-                      offset: Offset(0, 0),
-                    ),
-                  ],
-                ),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(
-                    sigmaX: 5.0,
-                    sigmaY: 5.0,
+          Visibility(
+            visible: isVisible,
+            child: Positioned(
+              bottom: 110.0,
+              // left: MediaQuery.of(context).size.width / 2 - 25,
+              left: 20,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(200),
+                child: Container(
+                  decoration: const BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 10,
+                        spreadRadius: 10,
+                        offset: Offset(0, 0),
+                      ),
+                    ],
                   ),
-                  child: IconButton(
-                    onPressed: () {
-                      textEditingController.clear();
-                    },
-                    icon: const Center(
-                      child: Icon(
-                        Icons.clear,
-                        color: Colors.green,
-                        size: 25.0,
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: 5.0,
+                      sigmaY: 5.0,
+                    ),
+                    child: IconButton(
+                      onPressed: () {
+                        textEditingController.clear();
+                      },
+                      icon: const Center(
+                        child: Icon(
+                          Icons.clear,
+                          color: Colors.green,
+                          size: 25.0,
+                        ),
                       ),
                     ),
                   ),
@@ -236,101 +234,241 @@ class _PostScreenState extends ConsumerState<PostScreen> {
               ),
             ),
           ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: PostTextField(
-              postMessage: postMessage,
-              textEditingController: textEditingController,
+          Visibility(
+            visible: isVisible,
+            child: Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: PostTextField(
+                postMessage: postMessage,
+                textEditingController: textEditingController,
+              ),
             ),
-          )
+          ),
+          showSearchButton
+              ? AnimatedPositioned(
+                  duration: const Duration(milliseconds: 300),
+                  top: 0,
+                  left: 150,
+                  right: 150,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        showSearchButton = false;
+                      });
+                    },
+                    child: Icon(
+                      Icons.search,
+                      color: isDarkMode ? Colors.white : Colors.blue,
+                    ),
+                  ),
+                )
+              : AnimatedPositioned(
+                  duration: const Duration(milliseconds: 300),
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.grey,
+                          width: 1.0,
+                        ),
+                      ),
+                    ),
+                    child: TextField(
+                      onTap: () {
+                        setState(() {
+                          isVisible = false;
+                        });
+                      },
+                      controller: searchEditingController,
+                      onChanged: (value) {
+                        setState(() {
+                          searchQuery = searchEditingController.text;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        contentPadding: const EdgeInsets.all(14),
+                        hintText: 'Search by email',
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              searchEditingController.clear();
+                              searchQuery = '';
+                            });
+                          },
+                          icon: const Icon(
+                            Icons.clear,
+                            color: Colors.green,
+                            size: 25.0,
+                          ),
+                        ),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                          // add border bottom
+
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
         ],
       ),
     );
   }
 }
 
-  //  ListView.builder(
-                  //   controller: _scrollController,
-                  //   itemCount: posts.length,
-                  //   itemBuilder: (context, index) {
-                  //     final post = snapshot.data!.docs[index];
-                  //     return MyCard(
-                  //       content: post['Message'],
-                  //       email: post['UserEmail'],
-                  //       onDelete: () {
-                  //         FirebaseFirestore.instance
-                  //             .collection('User Posts')
-                  //             .doc(post.id)
-                  //             .delete();
-                  //       },
-                  //       timeStamp: post['TimeStamp'],
-                  //       textContentController: textEditingController,
-                  //       onUpdated: (String value) {
-                  //         FirebaseFirestore.instance
-                  //             .collection('User Posts')
-                  //             .doc(post.id)
-                  //             .update({
-                  //           'Message': value,
-                  //         });
-                  //       },
-                  //     );
-                  //   },
-                  // ),
+//  ListView.builder(
+//   controller: _scrollController,
+//   itemCount: posts.length,
+//   itemBuilder: (context, index) {
+//     final post = snapshot.data!.docs[index];
+//     return MyCard(
+//       content: post['Message'],
+//       email: post['UserEmail'],
+//       onDelete: () {
+//         FirebaseFirestore.instance
+//             .collection('User Posts')
+//             .doc(post.id)
+//             .delete();
+//       },
+//       timeStamp: post['TimeStamp'],
+//       textContentController: textEditingController,
+//       onUpdated: (String value) {
+//         FirebaseFirestore.instance
+//             .collection('User Posts')
+//             .doc(post.id)
+//             .update({
+//           'Message': value,
+//         });
+//       },
+//     );
+//   },
+// ),
 
+// Positioned(
+//   bottom: 100.0,
+//   left: MediaQuery.of(context).size.width / 2 - 25,
+//   child: Visibility(
+//     visible: _showScrollToTopButton,
+//     child: ClipRRect(
+//       borderRadius: BorderRadius.circular(200),
+//       child: Container(
+//         decoration: const BoxDecoration(
+//           boxShadow: [
+//             BoxShadow(
+//               color: Colors.black12,
+//               blurRadius: 10,
+//               spreadRadius: 10,
+//               offset: Offset(0, 0),
+//             ),
+//           ],
+//         ),
+//         child: BackdropFilter(
+//           filter: ImageFilter.blur(
+//             sigmaX: 5.0,
+//             sigmaY: 5.0,
+//           ),
+//           child: IconButton(
+//             onPressed: () {
+//               // Scroll back to the top
+//               _scrollController.animateTo(
+//                 0.0,
+//                 duration: const Duration(seconds: 1),
+//                 curve: Curves.easeInOut,
+//               );
+//             },
+//             icon: const Center(
+//               child: Icon(
+//                 Icons.arrow_upward,
+//                 color: Colors.green,
+//                 size: 25.0,
+//               ),
+//             ),
+//           ),
+//         ),
+//       ),
+//     ),
+//   )),
+// Positioned(
+//   left: 0,
+//   right: 0,
+//   bottom: 0,
+//   child: PostTextField(
+//     postMessage: postMessage,
+//     textEditingController: textEditingController,
+//   ),
+// )
 
+// final ScrollController _scrollController = ScrollController();
 
-                  // Positioned(
-                  //   bottom: 100.0,
-                  //   left: MediaQuery.of(context).size.width / 2 - 25,
-                  //   child: Visibility(
-                  //     visible: _showScrollToTopButton,
-                  //     child: ClipRRect(
-                  //       borderRadius: BorderRadius.circular(200),
-                  //       child: Container(
-                  //         decoration: const BoxDecoration(
-                  //           boxShadow: [
-                  //             BoxShadow(
-                  //               color: Colors.black12,
-                  //               blurRadius: 10,
-                  //               spreadRadius: 10,
-                  //               offset: Offset(0, 0),
-                  //             ),
-                  //           ],
-                  //         ),
-                  //         child: BackdropFilter(
-                  //           filter: ImageFilter.blur(
-                  //             sigmaX: 5.0,
-                  //             sigmaY: 5.0,
-                  //           ),
-                  //           child: IconButton(
-                  //             onPressed: () {
-                  //               // Scroll back to the top
-                  //               _scrollController.animateTo(
-                  //                 0.0,
-                  //                 duration: const Duration(seconds: 1),
-                  //                 curve: Curves.easeInOut,
-                  //               );
-                  //             },
-                  //             icon: const Center(
-                  //               child: Icon(
-                  //                 Icons.arrow_upward,
-                  //                 color: Colors.green,
-                  //                 size: 25.0,
-                  //               ),
-                  //             ),
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   )),
-                // Positioned(
-                //   left: 0,
-                //   right: 0,
-                //   bottom: 0,
-                //   child: PostTextField(
-                //     postMessage: postMessage,
-                //     textEditingController: textEditingController,
-                //   ),
-                // )
+// @override
+// void initState() {
+//   super.initState();
+
+//   _scrollController.addListener(() {
+//     if (_scrollController.offset >= 100.0) {
+//       // Show the button when the user scrolls down by 100 pixels
+//       setState(() {
+//         _showScrollToTopButton = true;
+//       });
+
+//       // After 3 seconds, set _showScrollToTopButton back to false
+//       Future.delayed(const Duration(seconds: 2), () {
+//         setState(() {
+//           _showScrollToTopButton = false;
+//         });
+//       });
+//     }
+//     // else {
+//     //   // Hide the button when the user scrolls up
+//     //   setState(() {
+//     //     _showScrollToTopButton = false;
+//     //   });
+//     // }
+//   });
+// }
+
+class MyAlertDialog extends StatelessWidget {
+  final String title;
+  final String content;
+
+  // Constructor to receive title and content for the alert dialog
+  MyAlertDialog({required this.title, required this.content});
+
+  // Method to show the alert dialog
+  void show(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the alert dialog
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () {
+        // Call the show method to display the custom alert dialog
+        show(context);
+      },
+      child: Text('Show Alert'),
+    );
+  }
+}

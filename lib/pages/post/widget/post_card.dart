@@ -89,8 +89,8 @@ class _MyCardState extends ConsumerState<MyCard> {
                   ),
                   const Spacer(),
                   Visibility(
-                    visible:
-                        FirebaseAuth.instance.currentUser!.email == widget.email,
+                    visible: FirebaseAuth.instance.currentUser!.email ==
+                        widget.email,
                     child: PopupMenuButton(itemBuilder: (context) {
                       return [
                         PopupMenuItem(
@@ -98,7 +98,7 @@ class _MyCardState extends ConsumerState<MyCard> {
                             onPressed: () {
                               Navigator.pop(context);
                               textEditingController.text = widget.content;
-      
+
                               showDialog(
                                   context: context,
                                   builder: (context) {
@@ -146,7 +146,8 @@ class _MyCardState extends ConsumerState<MyCard> {
                                     );
                                   });
                             },
-                            child: const Text('Edit'),
+                            child: const SizedBox(
+                                width: double.infinity, child: Text('Edit')),
                           ),
                         ),
                         PopupMenuItem(
@@ -155,10 +156,13 @@ class _MyCardState extends ConsumerState<MyCard> {
                               Navigator.pop(context);
                               widget.onDelete();
                             },
-                            child: const Text(
-                              'Delete',
-                              style: TextStyle(
-                                color: Colors.red,
+                            child: const SizedBox(
+                              width: double.infinity,
+                              child: Text(
+                                'Delete',
+                                style: TextStyle(
+                                  color: Colors.red,
+                                ),
                               ),
                             ),
                           ),

@@ -27,7 +27,7 @@ class PostTextField extends ConsumerWidget {
             // color: Colors.red,
             border: Border(
               top: BorderSide(
-                color: isDarkMode ? Colors.white : Colors.blue,
+                color: isDarkMode ? Colors.grey : Colors.blue,
                 width: 1,
               ),
             ),
