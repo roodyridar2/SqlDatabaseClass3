@@ -14,8 +14,8 @@ import 'package:sqlcheatcode/widget/custom_page_view_ScrollPhysics.dart';
 import 'package:sqlcheatcode/widget/drawer.dart';
 
 final List<Widget> _tableList = [
-  const Home(),
   const PostScreen(),
+  const Home(),
   const QuizApp(),
 ];
 

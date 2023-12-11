@@ -47,6 +47,15 @@ final List<String> listKeywordsSql = [
   "AND",
   "OR",
   "NOT",
+  "||",
+  "<=",
+  ">=",
+  "<>",
+  "=",
+  "<",
+  ">",
+  "!=",
+  ";",
   "ORDER BY",
   "GROUP BY",
   "ORDER BY",
@@ -153,5 +162,4 @@ final List<String> listKeywordsSql = [
   "SHUTDOWN",
   "(",
   ")",
-  
 ];

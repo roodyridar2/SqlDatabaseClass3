@@ -3,16 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sqlcheatcode/main.dart';
 import 'package:sqlcheatcode/notifier/theme_notifier.dart';
-import 'package:sqlcheatcode/pages/templateQuries/widget/sqlFormattedText.dart';
 import 'package:sqlcheatcode/util/constText.dart';
 
 Widget buildExpansionTile({
   required String title,
-  // required List<String> keywords,
-  required List<String> texts,
-  // required List<String> keywords2,
-  required List<String> texts2,
-  required String description,
+  // not user any more
+  List<String> texts = const [],
+  String description = '',
+  // --------------------
+
+  required String example,
+  String example2 = '',
   required String imagePath,
 }) {
   return GestureDetector(
@@ -30,9 +31,7 @@ Widget buildExpansionTile({
       elevation: 4,
       child: ExpansionTile(
         shape: Border.all(color: Colors.transparent),
-        // title: SqlFormattedText(keywords: keywords, texts: texts),
-        title: SqlFormatterText(texts),
-        // subtitle: Text(description),
+        title: Text(title),
         children: [
           Container(
             width: double.infinity,
@@ -42,10 +41,11 @@ Widget buildExpansionTile({
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(description),
-                  const SizedBox(height: 10),
-                  // SqlFormattedText(keywords: keywords2, texts: texts2),
-                  SqlFormatterText(texts2)
+                  SqlFormatterText(example),
+                  const SizedBox(height: 5),
+                  if (example2.isNotEmpty) const Divider(),
+                  const SizedBox(height: 5),
+                  if (example2.isNotEmpty) SqlFormatterText(example2)
                 ],
               ),
             ),
@@ -160,8 +160,11 @@ class _ShowDialogImageState extends State<ShowDialogImage> {
 }
 
 class SqlFormatterText extends ConsumerWidget {
-  const SqlFormatterText(this.listTexts, {super.key});
-  final List<String> listTexts;
+  const SqlFormatterText(this.text, {super.key});
+  // final List<String> listTexts;
+  final String text;
+
+  List<String> get listTexts => text.split(" ");
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

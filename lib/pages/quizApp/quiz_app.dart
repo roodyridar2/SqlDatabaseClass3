@@ -94,11 +94,12 @@ class _QuizAppState extends ConsumerState<QuizApp> {
       body: Column(
         children: [
           Text(
-            "Selected Lectured to start Quiz",
+            "Select Lecture",
             style: TextStyle(
               color: isDarkMode ? Colors.white : Colors.blue,
               fontSize: 24,
             ),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(
             height: 20,
