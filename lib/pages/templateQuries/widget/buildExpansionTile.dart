@@ -6,6 +6,7 @@ import 'package:sqlcheatcode/notifier/theme_notifier.dart';
 import 'package:sqlcheatcode/util/constText.dart';
 
 Widget buildExpansionTile({
+  required String index,
   required String title,
   // not user any more
   List<String> texts = const [],
@@ -30,6 +31,8 @@ Widget buildExpansionTile({
     child: Card(
       elevation: 4,
       child: ExpansionTile(
+        // trailing: const Icon(Icons.arrow_drop_down_circle_outlined),
+        leading: Text(index),
         shape: Border.all(color: Colors.transparent),
         title: Text(title),
         children: [
