@@ -22,8 +22,8 @@ class _HomeState extends ConsumerState<Home> {
   late int layoutSelect;
   @override
   void initState() {
-    layoutSelect = _myTimerBox.get("homeLayout") ?? 2;
-    crossValue = _myTimerBox.get("homeLayout") ?? 2;
+    layoutSelect = _myTimerBox.get("homeLayout") ?? 1;
+    crossValue = _myTimerBox.get("homeLayout") ?? 1;
     super.initState();
   }
 

@@ -4,9 +4,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqlcheatcode/notifier/theme_notifier.dart';
+import 'package:sqlcheatcode/pages/post/widget/bottomSheet_textFeild.dart';
 // import 'package:sqlcheatcode/notifier/theme_notifier.dart';
 import 'package:sqlcheatcode/pages/post/widget/post_card.dart';
 import 'package:sqlcheatcode/pages/post/widget/post_text_field.dart';
+import 'package:sqlcheatcode/pages/post/widget/question_card.dart';
 
 class PostScreen extends ConsumerStatefulWidget {
   const PostScreen({super.key});
@@ -18,12 +20,15 @@ class PostScreen extends ConsumerStatefulWidget {
 class _PostScreenState extends ConsumerState<PostScreen> {
   final currentUser = FirebaseAuth.instance.currentUser;
   final textEditingController = TextEditingController();
+  final textBottomSheetQuestion = TextEditingController();
+  final textBottomSheetAnswer = TextEditingController();
   final PageController _scrollController = PageController();
   final searchEditingController = TextEditingController();
   String searchQuery = '';
 
   void postMessage() async {
-    if (textEditingController.text.isEmpty) {
+    if (textEditingController.text.isEmpty ||
+        textEditingController.text.trim() == '') {
       return;
     }
     String postMessage = textEditingController.text;
@@ -39,7 +44,70 @@ class _PostScreenState extends ConsumerState<PostScreen> {
         'Message': postMessage,
         'TimeStamp': Timestamp.now(),
         // 'id': FirebaseFirestore.instance.collection('User Posts').doc().id,
-        'Likes': []
+        'Likes': [],
+        'Question': '',
+        'Answer': '',
+      });
+    } catch (e) {
+      // print('Error: $e');
+    }
+  }
+
+  void postQuestion() async {
+    if (textBottomSheetAnswer.text.isEmpty ||
+        textBottomSheetAnswer.text.trim() == '' ||
+        textBottomSheetAnswer.text.length < 3) {
+      return;
+    }
+    if (textBottomSheetQuestion.text.isEmpty ||
+        textBottomSheetQuestion.text.trim() == '' ||
+        textBottomSheetQuestion.text.length < 3) {
+      return;
+    }
+
+    _scrollController.animateToPage(
+      0,
+      duration: const Duration(seconds: 1),
+      curve: Curves.easeInOut,
+    );
+    try {
+      await FirebaseFirestore.instance.collection('User Posts').add({
+        'UserEmail': currentUser!.email,
+        'Message': '',
+        'TimeStamp': Timestamp.now(),
+        // 'id': FirebaseFirestore.instance.collection('User Posts').doc().id,
+        'Likes': [],
+        'Question': textBottomSheetQuestion.text,
+        'Answer': textBottomSheetAnswer.text,
+      });
+    } catch (e) {
+      // print('Error: $e');
+    }
+  }
+
+  void addReport(QueryDocumentSnapshot<Object?> post, String message,
+      String question, String answer, String email) async {
+    var docSnapshot = await FirebaseFirestore.instance
+        .collection('User Reports')
+        .doc(post.id)
+        .get();
+
+    var isExist = docSnapshot.exists;
+    if (isExist) {
+      return;
+    }
+
+    try {
+      await FirebaseFirestore.instance
+          .collection('User Reports')
+          .doc(post.id)
+          .set({
+        'UserEmail': email,
+        'TimeStamp': Timestamp.now(),
+        'Message': message,
+        // 'id': FirebaseFirestore.instance.collection('User Posts').doc().id,
+        'Question': question,
+        'Answer': answer,
       });
     } catch (e) {
       // print('Error: $e');
@@ -96,24 +164,24 @@ class _PostScreenState extends ConsumerState<PostScreen> {
                     // Add any additional logic you need based on scroll events
                     return false;
                   },
-                  child: PageView.builder(
-                      controller: _scrollController,
-                      itemCount: posts.length,
-                      scrollDirection: Axis.vertical,
-                      itemBuilder: (context, index) {
-                        final post = posts[index];
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        FocusScope.of(context).unfocus();
 
-                        return SingleChildScrollView(
-                          physics: const NeverScrollableScrollPhysics(),
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                FocusScope.of(context).unfocus();
+                        isVisible = true;
+                        showSearchButton = true;
+                      });
+                    },
+                    child: PageView.builder(
+                        controller: _scrollController,
+                        itemCount: posts.length,
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (context, index) {
+                          final post = posts[index];
 
-                                isVisible = true;
-                                showSearchButton = true;
-                              });
-                            },
+                          return SingleChildScrollView(
+                            physics: const NeverScrollableScrollPhysics(),
                             child: SizedBox(
                               // color: Colors.amber,
                               height: 535,
@@ -124,22 +192,59 @@ class _PostScreenState extends ConsumerState<PostScreen> {
                                   bottom: 25.0,
                                   top: 60.0,
                                 ),
-                                child: MyCard(
-                                  content: post['Message'],
-                                  email: post['UserEmail'],
-                                  onDelete: () => onDelete(post),
-                                  timeStamp: post['TimeStamp'],
-                                  textContentController: textEditingController,
-                                  onUpdated: (String value) =>
-                                      onUpdated(value, post),
-                                  likes: List<String>.from(post['Likes'] ?? []),
-                                  postId: post.id,
-                                ),
+                                child: post['Message'] == ''
+                                    ? QuestionCard(
+                                        question: post["Question"],
+                                        answer: post["Answer"],
+                                        email: post["UserEmail"],
+                                        onDelete: () => onDelete(post),
+                                        timeStamp: post["TimeStamp"],
+                                        onUpdated: (List<String> value) {
+                                          FirebaseFirestore.instance
+                                              .collection('User Posts')
+                                              .doc(post.id)
+                                              .update({
+                                            'Question': value[0],
+                                            'Answer': value[1],
+                                          });
+                                        },
+                                        report: (String message,
+                                            String question,
+                                            String answer,
+                                            String email) {
+                                          addReport(post, message, question,
+                                              answer, email);
+                                        },
+                                      )
+                                    : MyCard(
+                                        content: post['Message'],
+                                        email: post['UserEmail'],
+                                        onDelete: () => onDelete(post),
+                                        timeStamp: post['TimeStamp'],
+                                        textContentController:
+                                            textEditingController,
+                                        onUpdated: (String value) =>
+                                            onUpdated(value, post),
+                                        likes: List<String>.from(
+                                            post['Likes'] ?? []),
+                                        postId: post.id,
+                                        report: (String message,
+                                                String question,
+                                                String answer,
+                                                String email) =>
+                                            addReport(
+                                          post,
+                                          message,
+                                          question,
+                                          answer,
+                                          email,
+                                        ),
+                                      ),
                               ),
                             ),
-                          ),
-                        );
-                      }),
+                          );
+                        }),
+                  ),
                 );
               } else if (snapshot.hasError) {
                 return const Center(child: Text('Something went wrong'));
@@ -316,159 +421,114 @@ class _PostScreenState extends ConsumerState<PostScreen> {
                     ),
                   ),
                 ),
+          Visibility(
+            visible: isVisible,
+            child: Positioned(
+              bottom: 110.0,
+              left: MediaQuery.of(context).size.width / 2 - 25,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(200),
+                child: Container(
+                  decoration: const BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 10,
+                        spreadRadius: 10,
+                        offset: Offset(0, 0),
+                      ),
+                    ],
+                  ),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: 5.0,
+                      sigmaY: 5.0,
+                    ),
+                    child: IconButton(
+                      onPressed: () {
+                        showModalBottomSheet(
+                          isScrollControlled: true,
+                          context: context,
+                          builder: (BuildContext context) {
+                            return SizedBox(
+                              height: 800,
+                              // color: Colors.amber,
+                              width: double.infinity,
+                              child: Column(
+                                children: [
+                                  const SizedBox(height: 10),
+                                  MyBottomSheetTextField(
+                                    controller: textBottomSheetQuestion,
+                                    hintText: "write your question here",
+                                    isQuestion: true,
+                                    title: 'Front Card:',
+                                  ),
+                                  MyBottomSheetTextField(
+                                    controller: textBottomSheetAnswer,
+                                    hintText: "write your answer here",
+                                    isQuestion: false,
+                                    title: 'Back of Card:',
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.redAccent,
+                                        ),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text(
+                                          "Close",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16),
+                                        ),
+                                      ),
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.green,
+                                        ),
+                                        onPressed: () {
+                                          {
+                                            postQuestion();
+                                            FocusScope.of(context).unfocus();
+                                            textBottomSheetQuestion.clear();
+                                            textBottomSheetAnswer.clear();
+                                            Navigator.of(context).pop();
+                                          }
+                                        },
+                                        child: const Icon(
+                                          Icons.send,
+                                          color: Colors.white,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      icon: const Center(
+                        child: Icon(
+                          Icons.swap_vert,
+                          color: Colors.green,
+                          size: 25.0,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
-    );
-  }
-}
-
-//  ListView.builder(
-//   controller: _scrollController,
-//   itemCount: posts.length,
-//   itemBuilder: (context, index) {
-//     final post = snapshot.data!.docs[index];
-//     return MyCard(
-//       content: post['Message'],
-//       email: post['UserEmail'],
-//       onDelete: () {
-//         FirebaseFirestore.instance
-//             .collection('User Posts')
-//             .doc(post.id)
-//             .delete();
-//       },
-//       timeStamp: post['TimeStamp'],
-//       textContentController: textEditingController,
-//       onUpdated: (String value) {
-//         FirebaseFirestore.instance
-//             .collection('User Posts')
-//             .doc(post.id)
-//             .update({
-//           'Message': value,
-//         });
-//       },
-//     );
-//   },
-// ),
-
-// Positioned(
-//   bottom: 100.0,
-//   left: MediaQuery.of(context).size.width / 2 - 25,
-//   child: Visibility(
-//     visible: _showScrollToTopButton,
-//     child: ClipRRect(
-//       borderRadius: BorderRadius.circular(200),
-//       child: Container(
-//         decoration: const BoxDecoration(
-//           boxShadow: [
-//             BoxShadow(
-//               color: Colors.black12,
-//               blurRadius: 10,
-//               spreadRadius: 10,
-//               offset: Offset(0, 0),
-//             ),
-//           ],
-//         ),
-//         child: BackdropFilter(
-//           filter: ImageFilter.blur(
-//             sigmaX: 5.0,
-//             sigmaY: 5.0,
-//           ),
-//           child: IconButton(
-//             onPressed: () {
-//               // Scroll back to the top
-//               _scrollController.animateTo(
-//                 0.0,
-//                 duration: const Duration(seconds: 1),
-//                 curve: Curves.easeInOut,
-//               );
-//             },
-//             icon: const Center(
-//               child: Icon(
-//                 Icons.arrow_upward,
-//                 color: Colors.green,
-//                 size: 25.0,
-//               ),
-//             ),
-//           ),
-//         ),
-//       ),
-//     ),
-//   )),
-// Positioned(
-//   left: 0,
-//   right: 0,
-//   bottom: 0,
-//   child: PostTextField(
-//     postMessage: postMessage,
-//     textEditingController: textEditingController,
-//   ),
-// )
-
-// final ScrollController _scrollController = ScrollController();
-
-// @override
-// void initState() {
-//   super.initState();
-
-//   _scrollController.addListener(() {
-//     if (_scrollController.offset >= 100.0) {
-//       // Show the button when the user scrolls down by 100 pixels
-//       setState(() {
-//         _showScrollToTopButton = true;
-//       });
-
-//       // After 3 seconds, set _showScrollToTopButton back to false
-//       Future.delayed(const Duration(seconds: 2), () {
-//         setState(() {
-//           _showScrollToTopButton = false;
-//         });
-//       });
-//     }
-//     // else {
-//     //   // Hide the button when the user scrolls up
-//     //   setState(() {
-//     //     _showScrollToTopButton = false;
-//     //   });
-//     // }
-//   });
-// }
-
-class MyAlertDialog extends StatelessWidget {
-  final String title;
-  final String content;
-
-  // Constructor to receive title and content for the alert dialog
-  MyAlertDialog({required this.title, required this.content});
-
-  // Method to show the alert dialog
-  void show(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(title),
-          content: Text(content),
-          actions: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the alert dialog
-              },
-              child: Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        // Call the show method to display the custom alert dialog
-        show(context);
-      },
-      child: Text('Show Alert'),
     );
   }
 }

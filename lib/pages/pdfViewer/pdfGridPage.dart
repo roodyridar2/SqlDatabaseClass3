@@ -49,7 +49,7 @@ class _PdfGridCardState extends ConsumerState<PdfGridCard> {
                 width: double.infinity,
                 height: 100,
                 child: GestureDetector(
-                  onLongPress: _launchInBrowserView,
+                  onTap: _launchInBrowserView,
                   child: Column(
                     children: [
                       Row(
@@ -240,10 +240,11 @@ class BuildGridViewPdf extends ConsumerWidget {
     return GridView.builder(
       itemCount: lectureNames.length + 1,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: crossAxisCount,
-          childAspectRatio: aspectRatio,
-          mainAxisSpacing: 5,
-          crossAxisSpacing: 5),
+        crossAxisCount: crossAxisCount,
+        childAspectRatio: aspectRatio,
+        mainAxisSpacing: 5,
+        crossAxisSpacing: 5,
+      ),
       itemBuilder: (context, index) {
         return index < lectureNames.length
             ? InkWell(
@@ -299,7 +300,7 @@ class BuildGridViewPdf extends ConsumerWidget {
                   ),
                 ),
               )
-            : SizedBox();
+            : const SizedBox();
       },
     );
   }

@@ -61,15 +61,18 @@ class CardWidgetInkwell extends ConsumerWidget {
                   ),
                   const SizedBox(height: 10),
 
-                  Text(
-                    description,
-                    style: GoogleFonts.lato(
-                      fontSize: sizeText == SizeObj.small ? 8 : 14,
-                      color: Colors.white,
-                      textStyle:
-                          Theme.of(context).textTheme.titleLarge!.copyWith(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Text(
+                      description,
+                      style: GoogleFonts.lato(
+                        fontSize: sizeText == SizeObj.small ? 8 : 14,
+                        color: Colors.white,
+                        textStyle:
+                            Theme.of(context).textTheme.titleLarge!.copyWith(),
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
@@ -83,6 +86,5 @@ class CardWidgetInkwell extends ConsumerWidget {
             title: title,
           );
         });
-
   }
 }

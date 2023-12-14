@@ -89,7 +89,6 @@ class _QuizAppState extends ConsumerState<QuizApp> {
     ref.watch(themeChangerNotifierProvider);
     bool isDarkMode =
         ref.watch(themeChangerNotifierProvider.notifier).getValue();
-    TextEditingController _textController = TextEditingController();
     return Scaffold(
       body: Column(
         children: [

@@ -61,7 +61,7 @@ class _QuestionsScreenState extends ConsumerState<QuestionsScreen> {
               child: Stack(
                 children: [
                   Card(
-                    color: isDark ? CardTheme().color : Colors.blue,
+                    color: isDark ? const CardTheme().color : Colors.blue,
                     child: SizedBox(
                       height: 80,
                       child: Center(
@@ -100,19 +100,26 @@ class _QuestionsScreenState extends ConsumerState<QuestionsScreen> {
             ),
 
             const SizedBox(height: 10),
-            ...currentQuestion.getShuffledAnswer().map(
-              (answer) {
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: AnswerButton(
-                    answerText: answer,
-                    onTap: () {
-                      answerQuestion(answer);
-                    },
-                  ),
-                );
-              },
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                ...currentQuestion.getShuffledAnswer().map(
+                  (answer) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: AnswerButton(
+                        answerText: answer,
+                        onTap: () {
+                          answerQuestion(answer);
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
+
             // ...[SizedBox(), SizedBox()],
             // AnswerButton(answerText: currentQuestion.answers[0], onTap: () {}),
             // const Gap(10),

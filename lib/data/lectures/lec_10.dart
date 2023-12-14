@@ -14,7 +14,7 @@ List<Widget> lec10Data = [
   buildExpansionTile(
   index: '2',
   title: 'Describe the structure of the view',
-  example: "DESCRIBE empvu80",
+  example: "DESCRIBE empvu80 ;",
   imagePath: "${ImageFolderPath.lec1}/img1.png",
 ),
   buildExpansionTile(
@@ -26,13 +26,13 @@ List<Widget> lec10Data = [
   buildExpansionTile(
   index: '4',
   title: 'Retrieving Data from a View',
- example: "SELECT * FROM salvu50",
+ example: "SELECT * FROM salvu50 ;",
   imagePath: "${ImageFolderPath.lec1}/img1.png",
 ),
   buildExpansionTile(
   index: '5',
   title: 'Modifying a View',
- example: "CREATE OR REPLACE VIEW empvu80 ( id_number, name, sal, department_id ) AS SELECT employee_id, first_name || ' ' || last_name, salary, department_id FROM employees WHERE department_id = 80;",
+ example: "CREATE OR REPLACE VIEW empvu80 ( id_number, name, sal, department_id ) AS SELECT employee_id, first_name || ' ' || last_name, salary, department_id FROM employees WHERE department_id = 80 ;",
   imagePath: "${ImageFolderPath.lec1}/img1.png",
 ),
   buildExpansionTile(
@@ -58,7 +58,7 @@ List<Widget> lec10Data = [
   buildExpansionTile(
   index: '9',
   title: 'Removing a View',
-  example: "DROP VIEW empvu80;",
+  example: "DROP VIEW empvu80 ;",
   imagePath: "${ImageFolderPath.lec1}/img1.png",
 ),
 ];

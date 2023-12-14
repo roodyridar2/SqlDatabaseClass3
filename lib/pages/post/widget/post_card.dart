@@ -17,6 +17,7 @@ class MyCard extends ConsumerStatefulWidget {
     required this.onUpdated,
     required this.likes,
     required this.postId,
+    required this.report,
   });
 
   final String content;
@@ -27,6 +28,8 @@ class MyCard extends ConsumerStatefulWidget {
   final Function(String value) onUpdated;
   final List<String> likes;
   final String postId;
+  final void Function(
+      String message, String question, String answer, String email) report;
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _MyCardState();
@@ -88,88 +91,94 @@ class _MyCardState extends ConsumerState<MyCard> {
                     ),
                   ),
                   const Spacer(),
-                  Visibility(
-                    visible: FirebaseAuth.instance.currentUser!.email ==
-                        widget.email,
-                    child: PopupMenuButton(itemBuilder: (context) {
-                      return [
-                        PopupMenuItem(
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              textEditingController.text = widget.content;
+                  FirebaseAuth.instance.currentUser!.email == widget.email
+                      ? PopupMenuButton(itemBuilder: (context) {
+                          return [
+                            PopupMenuItem(
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  textEditingController.text = widget.content;
 
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return SizedBox(
-                                      child: AlertDialog(
-                                        title: const Text('Edit Post'),
-                                        content: SizedBox(
-                                          width: 500,
-                                          height: 100,
-                                          child: TextField(
-                                            maxLength: 400,
-                                            maxLines: null,
-                                            controller: textEditingController,
-                                          ),
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text(
-                                              'Cancel',
-                                              style: TextStyle(
-                                                color: Colors.red,
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return SizedBox(
+                                          child: AlertDialog(
+                                            title: const Text('Edit Post'),
+                                            content: SizedBox(
+                                              width: 500,
+                                              height: 100,
+                                              child: TextField(
+                                                maxLength: 400,
+                                                maxLines: null,
+                                                controller:
+                                                    textEditingController,
                                               ),
                                             ),
-                                          ),
-                                          TextButton(
-                                            onPressed: () {
-                                              widget.onUpdated(
-                                                  textEditingController.text);
-                                              Navigator.pop(context);
-                                            },
-                                            child: Text(
-                                              'Save',
-                                              style: TextStyle(
-                                                color: isDarkMode
-                                                    ? Colors.green
-                                                    : Colors.blue,
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text(
+                                                  'Cancel',
+                                                  style: TextStyle(
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
                                               ),
-                                            ),
+                                              TextButton(
+                                                onPressed: () {
+                                                  widget.onUpdated(
+                                                      textEditingController
+                                                          .text);
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text(
+                                                  'Save',
+                                                  style: TextStyle(
+                                                    color: isDarkMode
+                                                        ? Colors.green
+                                                        : Colors.blue,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    );
-                                  });
-                            },
-                            child: const SizedBox(
-                                width: double.infinity, child: Text('Edit')),
-                          ),
-                        ),
-                        PopupMenuItem(
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              widget.onDelete();
-                            },
-                            child: const SizedBox(
-                              width: double.infinity,
-                              child: Text(
-                                'Delete',
-                                style: TextStyle(
-                                  color: Colors.red,
+                                        );
+                                      });
+                                },
+                                child: const SizedBox(
+                                    width: double.infinity,
+                                    child: Text('Edit')),
+                              ),
+                            ),
+                            PopupMenuItem(
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  widget.onDelete();
+                                },
+                                child: const SizedBox(
+                                  width: double.infinity,
+                                  child: Text(
+                                    'Delete',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                      ];
-                    }),
-                  ),
+                          ];
+                        })
+                      : IconButton(
+                          onPressed: () {
+                            widget.report(widget.content, "", "", widget.email);
+                          },
+                          icon: Icon(Icons.report_gmailerrorred_sharp))
+                  // ),
                 ],
               ),
               const SizedBox(height: 8),

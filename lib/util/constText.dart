@@ -14,6 +14,7 @@ enum Lecture {
   lec13,
   lec14,
   lec15,
+  lec16,
 }
 
 final Map<Lecture, String> lectureNames = {
@@ -32,6 +33,7 @@ final Map<Lecture, String> lectureNames = {
   Lecture.lec13: 'Lecture 13',
   Lecture.lec14: 'Lecture 14',
   Lecture.lec15: 'Lecture 15',
+  Lecture.lec16: 'Lecture 16',
 };
 
 enum SizeObj {
@@ -217,6 +219,10 @@ final List<String> listKeywordsSql = [
   '),',
   '))',
   ')),',
+  '[',
+  ']',
+  "]'",
+  "'[",
   'VALUES(',
   'NUMBER(',
   'NUMBER',
