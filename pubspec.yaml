@@ -55,6 +55,8 @@ dependencies:
   animated_text_kit: ^4.2.2
   path_provider: ^2.1.1
   flip_card: ^0.7.0
+  sqflite: ^2.3.0
+  path: ^1.8.3
 
 dev_dependencies:
   flutter_test:
@@ -91,8 +93,6 @@ flutter:
     - assets/images/lec5/
     - assets/images/lec6/
     - assets/images/lec7/
-    - assets/icons/
-    - assets/voice/
     - assets/pdf/
     - assets/music/
 

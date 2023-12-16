@@ -106,13 +106,16 @@ class _QuestionsScreenState extends ConsumerState<QuestionsScreen> {
               children: [
                 ...currentQuestion.getShuffledAnswer().map(
                   (answer) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: AnswerButton(
-                        answerText: answer,
-                        onTap: () {
-                          answerQuestion(answer);
-                        },
+                    return SizedBox(
+                      height: 75,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: AnswerButton(
+                          answerText: answer,
+                          onTap: () {
+                            answerQuestion(answer);
+                          },
+                        ),
                       ),
                     );
                   },

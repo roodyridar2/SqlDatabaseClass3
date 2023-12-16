@@ -2,45 +2,66 @@ import 'package:sqlcheatcode/model/quiz_model.dart';
 
 List<QuizQuestionModel> questionsLec2 = [
   const QuizQuestionModel(
-    'What are the main building blocks of Flutter UIs  2?',
+    'What is the primary purpose of the WHERE clause in SQL?',
     [
-      'Widgets',
-      'Components',
-      'Blocks',
-      'Functions',
-    ],
-  ),
-  const QuizQuestionModel('How are Flutter UIs built 2?', [
-    'By combining widgets in code',
-    'By combining widgets in a visual editor',
-    'By defining widgets in config files',
-    'By using XCode for iOS and Android Studio for Android',
-  ]),
-  const QuizQuestionModel(
-    'What\'s the purpose of a StatefulWidget 2?',
-    [
-      'Update UI as data changes',
-      'Update data as UI changes',
-      'Ignore data changes',
-      'Render UI that does not depend on data',
+      'To restrict the rows that are retrieved by a query', // Correct Answer
+      'To specify the order of rows in the result set',
+      'To perform mathematical operations on selected columns',
+      'To aggregate data based on specific conditions',
     ],
   ),
   const QuizQuestionModel(
-    'Which widget should you try to use more often: StatelessWidget or StatefulWidget 2?',
+    'Which condition is used to check for null values in a column?',
     [
-      'StatelessWidget',
-      'StatefulWidget',
-      'Both are equally good',
-      'None of the above',
+      'IS NULL', // Correct Answer
+      'BETWEEN',
+      'LIKE',
+      'NOT IN',
     ],
   ),
   const QuizQuestionModel(
-    'What happens if you change data in a StatelessWidget 2?',
+    'What is the purpose of the LIKE condition in SQL?',
     [
-      'The UI is not updated',
-      'The UI is updated',
-      'The closest StatefulWidget is updated',
-      'Any nested StatefulWidgets are updated',
+      'To match a character pattern', // Correct Answer
+      'To perform mathematical operations',
+      'To check for null values',
+      'To test for values in a list',
+    ],
+  ),
+  const QuizQuestionModel(
+    'What is the correct usage of the AND logical operator?',
+    [
+      'Requires both component conditions to be true', // Correct Answer
+      'Requires either condition to be true',
+      'Returns TRUE if the following condition is false',
+      'Returns TRUE if both component conditions are false',
+    ],
+  ),
+  const QuizQuestionModel(
+    'How can you override the rules of precedence in a SQL statement?',
+    [
+      'Use parentheses', // Correct Answer
+      'Use quotation marks',
+      'Use square brackets',
+      'Use a semicolon',
+    ],
+  ),
+  const QuizQuestionModel(
+    'Which SQL clause is used to sort retrieved rows?',
+    [
+      'ORDER BY', // Correct Answer
+      'GROUP BY',
+      'HAVING',
+      'SELECT DISTINCT',
+    ],
+  ),
+  const QuizQuestionModel(
+    'What does the double ampersand (&&) substitution variable do in SQL*Plus?',
+    [
+      'Prompts the user for a value each time it is used', // Correct Answer
+      'Prompts the user once for a value',
+      'Is used to store values temporarily',
+      'Is used for mathematical operations',
     ],
   ),
 ];

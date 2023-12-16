@@ -37,15 +37,7 @@ List<QuizQuestionModel> questionsLec1 = [
       'ORDER BY',
     ],
   ),
-  const QuizQuestionModel(
-    'What is the purpose of the DISTINCT keyword in a SELECT statement?',
-    [
-      'It filters out duplicate rows from the result set.', // Correct Answer
-      'It adds a new column to the result set.',
-      'It specifies the sorting order of the result set.',
-      'It performs mathematical calculations on the result set.',
-    ],
-  ),
+ 
   const QuizQuestionModel(
     'In SQL, which operator is used for concatenating two strings?',
     [

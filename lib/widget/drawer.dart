@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqlcheatcode/notifier/theme_notifier.dart';
 import 'package:sqlcheatcode/pages/pdfViewer/pdfGridPage.dart';
 import 'package:sqlcheatcode/pages/quizApp/record_screen.dart';
+import 'package:sqlcheatcode/pages/sqlSumulater/sql_screen.dart';
 
 class NavDrawer extends ConsumerWidget {
   const NavDrawer({super.key});
@@ -75,6 +76,20 @@ class NavDrawer extends ConsumerWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const PdfGridCard(),
+                ),
+              )
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.code),
+            title: const Text(
+              'Sql Simulator',
+            ),
+            onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SqlSimulator(),
                 ),
               )
             },

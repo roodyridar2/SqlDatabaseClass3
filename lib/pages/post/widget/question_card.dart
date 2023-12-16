@@ -4,7 +4,6 @@ import 'package:flip_card/flip_card_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqlcheatcode/notifier/theme_notifier.dart';
-import 'package:sqlcheatcode/pages/post/post_page.dart';
 import 'package:sqlcheatcode/pages/post/widget/bottomSheet_textFeild.dart';
 import 'package:sqlcheatcode/util/time_stamp_formatter.dart';
 import 'package:flip_card/flip_card.dart';
