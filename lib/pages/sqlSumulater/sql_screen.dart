@@ -20,6 +20,9 @@ class _SqlSimulatorState extends State<SqlSimulator> {
   List<String> _preBuiltCommands = [];
 
   String? _selectedTableName = 'users';
+  int _commandExecutedCounter = 0;
+
+  Color colorCounter = Colors.green;
 
   @override
   void initState() {
@@ -36,22 +39,42 @@ class _SqlSimulatorState extends State<SqlSimulator> {
       version: 1,
       onCreate: (Database db, int version) async {
         await db.execute(
-          'CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, age INTEGER)',
+          'CREATE TABLE users (id INTEGER PRIMARY KEY, first_name TEXT,last_name TEXT, age INTEGER, location TEXT)',
         );
       },
     );
 
+    // add data to users table with name and locations and age and date time
+
     await _database.rawQuery(
-      'INSERT INTO users (name, age) VALUES ("John Doe", 25);',
+      'INSERT INTO users (first_name , last_name, age, location) VALUES ("John","Doe", 25, "boston");',
     );
     await _database.rawQuery(
-      'INSERT INTO users (name, age) VALUES ("John kastryo", 28);',
+      'INSERT INTO users (first_name , last_name,age, location) VALUES ("John", "kastryo", 28, "boston");',
     );
     await _database.rawQuery(
-      'INSERT INTO users (name, age) VALUES ("roody ridar", 26);',
+      'INSERT INTO users (first_name ,last_name, age, location) VALUES ("roody", "ridar", 26, "myamar");',
     );
     await _database.rawQuery(
-      'INSERT INTO users (name, age) VALUES ("crimson knight", 25);',
+      'INSERT INTO users (first_name ,last_name, age, location) VALUES ("crimson", "knight", 31, "trurkey");',
+    );
+    await _database.rawQuery(
+      'INSERT INTO users (first_name , last_name,age, location) VALUES ("garou", "karati",21, "japanese");',
+    );
+    await _database.rawQuery(
+      'INSERT INTO users (first_name , last_name,age, location) VALUES ("saitama", "onePunch", 33, "japanese");',
+    );
+    await _database.rawQuery(
+      'INSERT INTO users (first_name , last_name,age, location) VALUES ("genos", "cyber",25, "japanese");',
+    );
+    await _database.rawQuery(
+      'INSERT INTO users (first_name , last_name,age, location) VALUES ("Shko", "magdid",20, "Kurdistan");',
+    );
+    await _database.rawQuery(
+      'INSERT INTO users (first_name , last_name,age, location) VALUES ("ayub", "mahmood",20, "Kurdistan");',
+    );
+    await _database.rawQuery(
+      'INSERT INTO users (first_name , last_name,age, location) VALUES ("ramyan", "palany",20, "Kurdistan");',
     );
 
     _updateTableList();
@@ -72,15 +95,17 @@ class _SqlSimulatorState extends State<SqlSimulator> {
     if (_selectedTableName != null) {
       commands.add('SELECT * FROM $_selectedTableName;');
       commands.add(
-          'CREATE TABLE $_selectedTableName (id INTEGER PRIMARY KEY, name TEXT, age INTEGER);');
+          'CREATE TABLE $_selectedTableName (id INTEGER PRIMARY KEY, first_name TEXT, last_name TEXT, age INTEGER);');
       commands.add(
-          'INSERT INTO $_selectedTableName (name, age) VALUES ("John Doe", 25);');
+          'INSERT INTO $_selectedTableName (first_name , last_name, age, location) VALUES ("Shko", "magdid",20, "Kurdistan");');
       commands.add(
-          'UPDATE $_selectedTableName SET age = 26 WHERE name = "John Doe";');
-      commands.add('DELETE FROM $_selectedTableName WHERE name = "John Doe";');
-      commands.add('SELECT name, age FROM $_selectedTableName WHERE age > 25;');
+          'UPDATE $_selectedTableName SET age = 26 WHERE first_name = "John Doe";');
       commands.add(
-          'SELECT name, COUNT(*) FROM $_selectedTableName GROUP BY name HAVING COUNT(*) > 1;');
+          'DELETE FROM $_selectedTableName WHERE first_name = "John Doe";');
+      commands.add(
+          'SELECT first_name, age FROM $_selectedTableName WHERE age > 25;');
+      commands.add(
+          'SELECT first_name, COUNT(*) FROM $_selectedTableName GROUP BY first_name HAVING COUNT(*) > 1;');
     }
     return commands;
   }
@@ -121,8 +146,13 @@ class _SqlSimulatorState extends State<SqlSimulator> {
           });
         }
       }
+      setState(() {
+        colorCounter = Colors.green;
+        _commandExecutedCounter++;
+      });
     } catch (e) {
       setState(() {
+        colorCounter = Colors.red;
         _result = 'Error: $e';
         _queryResults = [];
       });
@@ -142,6 +172,7 @@ class _SqlSimulatorState extends State<SqlSimulator> {
     setState(() {
       _result = 'Database reset successfully.';
       _queryResults = [];
+      _commandExecutedCounter = 0;
     });
   }
 
@@ -297,21 +328,57 @@ class _SqlSimulatorState extends State<SqlSimulator> {
               ),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.green,
+
+            // Execute Query Button
+            SizedBox(
+              height: 50,
+              width: double.infinity,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.green,
+                    ),
+                    onPressed: () {
+                      // hide keyboard
+                      if (_queryController.text.isEmpty) {
+                        return;
+                      }
+
+                      FocusScope.of(context).requestFocus(FocusNode());
+                      _executeQuery(_queryController.text);
+                    },
+                    child: const Text('Execute Query'),
+                  ),
+                  Positioned(
+                    left: 0,
+                    top: 0,
+                    child: Container(
+                      width: 25,
+                      height: 25,
+                      decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                              bottomRight: Radius.circular(10))
+                          // shape: BoxShape.circle,
+                          ),
+                      child: Center(
+                        child: Text(
+                          '$_commandExecutedCounter',
+                          style: TextStyle(
+                            color: colorCounter,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
               ),
-              onPressed: () {
-                // hide keyboard
-                if (_queryController.text.isEmpty) {
-                  return;
-                }
-                FocusScope.of(context).requestFocus(FocusNode());
-                _executeQuery(_queryController.text);
-              },
-              child: const Text('Execute Query'),
             ),
+
+            // show table result for success query
             Expanded(
               child: _queryResults.isNotEmpty
                   ? Scrollbar(

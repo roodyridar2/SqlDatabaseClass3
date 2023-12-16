@@ -3,13 +3,43 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
 import 'package:sqlcheatcode/notifier/theme_notifier.dart';
 import 'package:sqlcheatcode/pages/post/widget/bottomSheet_textFeild.dart';
-// import 'package:sqlcheatcode/notifier/theme_notifier.dart';
 import 'package:sqlcheatcode/pages/post/widget/post_card.dart';
 import 'package:sqlcheatcode/pages/post/widget/post_text_field.dart';
 import 'package:sqlcheatcode/pages/post/widget/question_card.dart';
 
+class DialogBox2 {
+  void show(
+    BuildContext context, {
+    required String title,
+    required String content,
+  }) {
+    // Call the showDialog function when the button is pressed
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // Use the AlertDialog to create the dialog
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // Close the dialog
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+// ------------------------------
 class PostScreen extends ConsumerStatefulWidget {
   const PostScreen({super.key});
 
@@ -25,12 +55,41 @@ class _PostScreenState extends ConsumerState<PostScreen> {
   final PageController _scrollController = PageController();
   final searchEditingController = TextEditingController();
   String searchQuery = '';
+  final _userRateLimitBox = Hive.box('rateLimit');
 
+  // _userRateLimitBox.put("homeLayout", value);
   void postMessage() async {
+    // ----------------- Rate Limit -----------------
+    DateTime now = DateTime.now();
+
+    String todayTime = DateTime(now.year, now.month, now.day).toString();
+
+    String userTime = _userRateLimitBox.get("dateTime") ?? todayTime;
+
+    if (userTime != todayTime) {
+      _userRateLimitBox.put("dateTime", todayTime);
+      _userRateLimitBox.put("postCount", 0);
+      DialogBox2().show(context, title: "reset", content: 'test');
+    }
+
+    int postCount = _userRateLimitBox.get("postCount") ?? 0;
+    if (postCount >= 5) {
+      DialogBox2().show(context,
+          title: "Rate Limit",
+          content:
+              "You can only post 5 times a day\nTry again later\nThank you\nDB3 Code Team\n👋$todayTime\n$userTime");
+      return;
+    }
+    _userRateLimitBox.put("postCount", postCount + 1);
+
+    //  -----------------------------------------------------
+
     if (textEditingController.text.isEmpty ||
         textEditingController.text.trim() == '') {
       return;
     }
+
+    //  -----------------------------------------------------
     String postMessage = textEditingController.text;
     textEditingController.clear();
     _scrollController.animateToPage(
@@ -39,6 +98,15 @@ class _PostScreenState extends ConsumerState<PostScreen> {
       curve: Curves.easeInOut,
     );
     try {
+      // to show message posted
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Message Posted'),
+          duration: Duration(milliseconds: 1000),
+        ),
+      );
+      // ----------------------
       await FirebaseFirestore.instance.collection('User Posts').add({
         'UserEmail': currentUser!.email,
         'Message': postMessage,
@@ -50,6 +118,12 @@ class _PostScreenState extends ConsumerState<PostScreen> {
       });
     } catch (e) {
       // print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+         SnackBar(
+          content: Text('$e'),
+          duration: const Duration(milliseconds: 1000),
+        ),
+      );
     }
   }
 

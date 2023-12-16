@@ -48,7 +48,35 @@ Widget buildExpansionTile({
                   const SizedBox(height: 5),
                   if (example2.isNotEmpty) const Divider(),
                   const SizedBox(height: 5),
-                  if (example2.isNotEmpty) SqlFormatterText(example2)
+                  if (example2.isNotEmpty) SqlFormatterText(example2),
+                  // Spacer(),
+                  const SizedBox(height: 5),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(
+                            color: Colors.green,
+                          ),
+                        ),
+                        onPressed: () {
+                          showDialog(
+                            context: navigatorKey.currentContext!,
+                            builder: (BuildContext context) {
+                              return ShowDialogImage(
+                                imagePath: imagePath,
+                              );
+                            },
+                          );
+                        },
+                        child: const Text(
+                          "Show result",
+                          style: TextStyle(color: Colors.green),
+                        ),
+                      ),
+                    ],
+                  )
                 ],
               ),
             ),

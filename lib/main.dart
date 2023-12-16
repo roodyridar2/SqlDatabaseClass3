@@ -7,12 +7,14 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await Hive.initFlutter();
   await Hive.openBox("myTimer");
   await Hive.openBox("myRecord");
+  await Hive.openBox("rateLimit");
   // await Hive.openBox("userQuestion");
 
   runApp(

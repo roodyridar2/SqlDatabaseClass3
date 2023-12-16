@@ -8,7 +8,6 @@ import 'package:sqlcheatcode/main.dart';
 import 'package:sqlcheatcode/notifier/theme_notifier.dart';
 import 'package:sqlcheatcode/pages/home/widget/customDilaog.dart';
 import 'package:sqlcheatcode/util/time_parser.dart';
-import 'package:sqlcheatcode/widget/notifier/isPlay_notifier.dart';
 
 class CustomAppBarMain extends ConsumerWidget {
   const CustomAppBarMain({

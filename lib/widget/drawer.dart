@@ -133,7 +133,7 @@ class NavDrawer extends ConsumerWidget {
           const Spacer(),
           const ListTile(
             title: Text(
-              "Verstion demo",
+              "Version 1.0.0",
               textAlign: TextAlign.center,
             ),
           )
