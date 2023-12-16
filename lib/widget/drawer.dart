@@ -33,20 +33,22 @@ class NavDrawer extends ConsumerWidget {
           //     style: TextStyle(color: Colors.white, fontSize: 25),
           //   ),
           // ),
-            
+
           Container(
             width: double.infinity,
             height: 200,
             decoration: BoxDecoration(
               image: DecorationImage(
-                colorFilter: ColorFilter.mode(
-                  isDark
-                      ? const Color.fromARGB(255, 75, 135, 77)
-                      : Colors.transparent,
-                  isDark ? BlendMode.color : BlendMode.color,
-                ),
+                // colorFilter: ColorFilter.mode(
+                //   isDark
+                //       ? const Color.fromARGB(255, 75, 135, 77)
+                //       : Colors.transparent,
+                //   isDark ? BlendMode.color : BlendMode.color,
+                // ),
                 fit: BoxFit.cover,
-                image: const AssetImage('assets/images/cover2.png'),
+                image: isDark
+                    ? const AssetImage('assets/images/cover1.jpeg')
+                    : const AssetImage('assets/images/cover2.jpeg'),
               ),
             ),
             child: const Text(
@@ -67,7 +69,7 @@ class NavDrawer extends ConsumerWidget {
             height: 1,
             thickness: 1,
           ),
-            
+
           ListTile(
             leading: const Icon(Icons.picture_as_pdf_rounded),
             title: const Text('Course Book'),
@@ -113,7 +115,7 @@ class NavDrawer extends ConsumerWidget {
             title: const Text('Settings'),
             onTap: () => {Navigator.of(context).pop()},
           ),
-            
+
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.red),
             title: const Text('Logout'),
@@ -121,11 +123,10 @@ class NavDrawer extends ConsumerWidget {
               await FirebaseAuth.instance.signOut();
             },
           ),
-            
+
           Switch(
             activeColor: Colors.green,
-            value:
-                ref.read(themeChangerNotifierProvider.notifier).getValue(),
+            value: ref.read(themeChangerNotifierProvider.notifier).getValue(),
             onChanged: (value) {
               ref.read(themeChangerNotifierProvider.notifier).toggleTheme();
             },

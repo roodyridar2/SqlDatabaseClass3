@@ -47,7 +47,11 @@ class PostScreen extends ConsumerStatefulWidget {
   ConsumerState<ConsumerStatefulWidget> createState() => _PostScreenState();
 }
 
-class _PostScreenState extends ConsumerState<PostScreen> {
+class _PostScreenState extends ConsumerState<PostScreen>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   final currentUser = FirebaseAuth.instance.currentUser;
   final textEditingController = TextEditingController();
   final textBottomSheetQuestion = TextEditingController();
@@ -60,27 +64,25 @@ class _PostScreenState extends ConsumerState<PostScreen> {
   // _userRateLimitBox.put("homeLayout", value);
   void postMessage() async {
     // ----------------- Rate Limit -----------------
-    DateTime now = DateTime.now();
+    // DateTime now = DateTime.now();
+    // String todayTime = DateTime(now.year, now.month, now.day).toString();
 
-    String todayTime = DateTime(now.year, now.month, now.day).toString();
+    // String userTime = _userRateLimitBox.get("dateTime") ?? "todayTime";
 
-    String userTime = _userRateLimitBox.get("dateTime") ?? todayTime;
+    // if (userTime != todayTime) {
+    //   _userRateLimitBox.put("dateTime", todayTime);
+    //   _userRateLimitBox.put("postCount", 0);
+    // }
 
-    if (userTime != todayTime) {
-      _userRateLimitBox.put("dateTime", todayTime);
-      _userRateLimitBox.put("postCount", 0);
-      DialogBox2().show(context, title: "reset", content: 'test');
-    }
-
-    int postCount = _userRateLimitBox.get("postCount") ?? 0;
-    if (postCount >= 5) {
-      DialogBox2().show(context,
-          title: "Rate Limit",
-          content:
-              "You can only post 5 times a day\nTry again later\nThank you\nDB3 Code Team\n👋$todayTime\n$userTime");
-      return;
-    }
-    _userRateLimitBox.put("postCount", postCount + 1);
+    // int postCount = _userRateLimitBox.get("postCount") ?? 0;
+    // if (postCount >= 5) {
+    //   DialogBox2().show(context,
+    //       title: "Rate Limit",
+    //       content:
+    //           "You can only post 5 times a day\nTry again later\nThank you\n\n Idea -> Ahmad Yaseen");
+    //   return;
+    // }
+    // _userRateLimitBox.put("postCount", postCount + 1);
 
     //  -----------------------------------------------------
 
@@ -118,12 +120,12 @@ class _PostScreenState extends ConsumerState<PostScreen> {
       });
     } catch (e) {
       // print('Error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-         SnackBar(
-          content: Text('$e'),
-          duration: const Duration(milliseconds: 1000),
-        ),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text('$e'),
+      //     duration: const Duration(milliseconds: 1000),
+      //   ),
+      // );
     }
   }
 
@@ -161,6 +163,30 @@ class _PostScreenState extends ConsumerState<PostScreen> {
 
   void addReport(QueryDocumentSnapshot<Object?> post, String message,
       String question, String answer, String email) async {
+    // make sure that the user can only report once
+    // dialog box
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Report"),
+            content: const Text("Are you sure you want to report this post?"),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    return;
+                  },
+                  child: const Text("No")),
+              TextButton(
+                  onPressed: () async {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text("Yes")),
+            ],
+          );
+        });
+
     var docSnapshot = await FirebaseFirestore.instance
         .collection('User Reports')
         .doc(post.id)
@@ -200,6 +226,12 @@ class _PostScreenState extends ConsumerState<PostScreen> {
 
   bool isVisible = true;
   bool showSearchButton = true;
+
+  @override
+  void dispose() {
+    super.dispose();
+    textEditingController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

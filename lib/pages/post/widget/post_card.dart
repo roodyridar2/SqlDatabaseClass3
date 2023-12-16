@@ -41,7 +41,6 @@ class _MyCardState extends ConsumerState<MyCard> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     isLiked = widget.likes.contains(currentUser.email);
   }
@@ -108,9 +107,10 @@ class _MyCardState extends ConsumerState<MyCard> {
                                             title: const Text('Edit Post'),
                                             content: SizedBox(
                                               width: 500,
-                                              height: 100,
+                                              height: 200,
                                               child: TextField(
-                                                maxLength: 400,
+                                                autofocus: true,
+                                                maxLength: 500,
                                                 maxLines: null,
                                                 controller:
                                                     textEditingController,
