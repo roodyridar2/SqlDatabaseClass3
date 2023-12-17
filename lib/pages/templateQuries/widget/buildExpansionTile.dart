@@ -15,7 +15,7 @@ Widget buildExpansionTile({
 
   required String example,
   String example2 = '',
-  required String imagePath,
+   String imagePath='',
 }) {
   return GestureDetector(
     onLongPress: () {

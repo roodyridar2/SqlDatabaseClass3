@@ -97,7 +97,7 @@ class _SqlSimulatorState extends State<SqlSimulator> {
       commands.add(
           'CREATE TABLE $_selectedTableName (id INTEGER PRIMARY KEY, first_name TEXT, last_name TEXT, age INTEGER);');
       commands.add(
-          'INSERT INTO $_selectedTableName (first_name , last_name, age, location) VALUES ("Shko", "magdid",20, "Kurdistan");');
+          'INSERT INTO $_selectedTableName (first_name , last_name, age) VALUES ("Shko", "magdid",20);');
       commands.add(
           'UPDATE $_selectedTableName SET age = 26 WHERE first_name = "John Doe";');
       commands.add(
