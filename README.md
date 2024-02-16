@@ -9,3 +9,6 @@ Welcome to the Flutter SQL Learning App repository! This project is designed to 
 3. **SQLite Integration:** Learn SQL concepts by interacting with a SQLite database embedded in the app.
 4. **User-Friendly Interface:** Enjoy a clean and intuitive user interface for a seamless learning experience.
 5. **Social Media Integration:** Users can create and share posts on social media.
+
+**screen shot of the project
+**https://drive.google.com/file/d/1TBEmp704LDXRd18vbD9sFVCIPo7orcrh/view?usp=sharing
