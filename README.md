@@ -11,5 +11,6 @@ Welcome to the Flutter SQL Learning App repository! This project is designed to 
 5. **Social Media Integration:** Users can create and share posts on social media.
 
    
-##Screen shot of the project
-**https://drive.google.com/file/d/1TBEmp704LDXRd18vbD9sFVCIPo7orcrh/view?usp=drive_link
+## Screen shot of the project
+
+** https://drive.google.com/drive/folders/1dqGVxOOPyozd1puLXvnYJndj3ZtT1_tO?usp=drive_link
