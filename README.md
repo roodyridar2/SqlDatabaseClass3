@@ -1,16 +1,9 @@
-# sqlcheatcode
+Flutter SQL Learning App
+Welcome to the Flutter SQL Learning App repository! This project is designed to help you learn SQL through a Flutter application. The app includes lectures and quizzes to enhance your understanding of SQL, and it utilizes SQLite as the database.
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Features
+Interactive Lectures: Engage in interactive SQL lectures within the Flutter app.
+Quizzes: Test your SQL knowledge with quizzes designed to reinforce your learning.
+SQLite Integration: Learn SQL concepts by interacting with a SQLite database embedded in the app.
+User-Friendly Interface: Enjoy a clean and intuitive user interface for a seamless learning experience.
+socail media: user able to create and share post 
